@@ -1,2 +1,186 @@
-Hello World
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="eicc27 的个人主页初版，用来展示个人简介、项目、近况与联系方式。"
+  >
+  <title>eicc27 | Personal Homepage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="topbar">
+        <a class="brand" href="#top">eicc27</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          菜单
+        </button>
+        <div class="nav-links" id="site-nav">
+          <a href="#about">关于我</a>
+          <a href="#projects">项目</a>
+          <a href="#timeline">近况</a>
+          <a href="#contact">联系</a>
+        </div>
+      </nav>
 
+      <div class="hero-grid" id="top">
+        <section class="hero-copy reveal">
+          <p class="eyebrow">GitHub Pages Starter</p>
+          <h1>把这里变成你的数字名片。</h1>
+          <p class="hero-text">
+            这是一个为 GitHub 个人主页准备的初版框架。现在它已经能作为首页上线，后续你只需要替换文案、
+            项目链接和个人信息，就能逐步扩成完整作品集。
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects">查看页面结构</a>
+            <a class="button button-secondary" href="https://github.com/eicc27" target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+          </div>
+        </section>
+
+        <aside class="hero-card reveal" aria-label="intro card">
+          <p class="card-label">Now</p>
+          <h2>正在搭建个人主页</h2>
+          <p>
+            这一版先把整体骨架、视觉风格和内容区块准备好，后面可以继续往里填：
+            自我介绍、代表项目、技能栈、博客入口，或者任何你想让别人第一眼看到的内容。
+          </p>
+          <ul class="quick-list">
+            <li>仓库：<span>eicc27/eicc27.github.io</span></li>
+            <li>类型：<span>纯静态站点</span></li>
+            <li>部署：<span>GitHub Pages</span></li>
+          </ul>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section class="section reveal" id="about">
+        <div class="section-heading">
+          <p class="eyebrow">About</p>
+          <h2>一个适合继续扩展的首页起点</h2>
+        </div>
+        <div class="about-grid">
+          <article class="panel">
+            <h3>你可以在这里写什么</h3>
+            <p>
+              简短介绍你的身份、方向和你关心的东西。比如你是前端开发、后端开发、游戏爱好者、
+              学习中的学生，或者正在做某个长期项目。页面现在已经预留了足够自然的展示结构。
+            </p>
+          </article>
+          <article class="panel emphasis">
+            <h3>建议优先补充</h3>
+            <p>
+              个人一句话介绍、3 个代表项目、一个可以联系到你的入口。这三样内容补上以后，
+              这个主页就已经足够对外展示。
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reveal" id="projects">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2>先把项目位留出来</h2>
+        </div>
+        <div class="cards-grid">
+          <article class="project-card">
+            <p class="project-tag">Featured 01</p>
+            <h3>项目名称占位</h3>
+            <p>
+              在这里写一句项目介绍，例如它解决了什么问题、你用了什么技术、或者它最值得看的部分是什么。
+            </p>
+            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
+          </article>
+          <article class="project-card">
+            <p class="project-tag">Featured 02</p>
+            <h3>作品 / 仓库占位</h3>
+            <p>
+              如果你后面想展示博客、脚本、小工具或课程作业，也可以直接沿用这一张卡片的结构继续扩展。
+            </p>
+            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
+          </article>
+          <article class="project-card">
+            <p class="project-tag">Featured 03</p>
+            <h3>长期进行中的内容</h3>
+            <p>
+              比如你的学习路线、游戏相关内容、个人实验、设计稿整理，或者任何你想持续更新的东西。
+            </p>
+            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reveal" id="timeline">
+        <div class="section-heading">
+          <p class="eyebrow">Timeline</p>
+          <h2>把“最近在做什么”也展示出来</h2>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item">
+            <span class="timeline-dot" aria-hidden="true"></span>
+            <div>
+              <p class="timeline-date">Step 01</p>
+              <h3>完成个人主页基础结构</h3>
+              <p>首页、视觉风格、移动端布局和基础交互已经准备好，可以直接继续填内容。</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-dot" aria-hidden="true"></span>
+            <div>
+              <p class="timeline-date">Step 02</p>
+              <h3>替换成你的真实资料</h3>
+              <p>把名字、介绍、项目卡片、联系方式换成真实内容，这个站点就会立刻更完整。</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-dot" aria-hidden="true"></span>
+            <div>
+              <p class="timeline-date">Step 03</p>
+              <h3>后续可继续加页面</h3>
+              <p>如果你想加博客列表、相册、简历页或作品详情页，也可以在当前结构上继续扩展。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section contact reveal" id="contact">
+        <div class="section-heading">
+          <p class="eyebrow">Contact</p>
+          <h2>把一个明确入口留给访问者</h2>
+        </div>
+        <div class="contact-panel">
+          <p>
+            这一块建议你至少保留一个长期可用的联系方式，比如 GitHub、邮箱或社交主页。
+            现在我先把 GitHub 入口放好，后面你可以继续补。
+          </p>
+          <div class="contact-links">
+            <a class="button button-primary" href="https://github.com/eicc27" target="_blank" rel="noreferrer">
+              打开 GitHub
+            </a>
+            <a class="button button-secondary" href="mailto:hello@example.com">
+              替换成你的邮箱
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© <span id="year"></span> eicc27. Built for GitHub Pages.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
