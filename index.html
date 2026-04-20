@@ -5,182 +5,830 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta
     name="description"
-    content="eicc27 的个人主页初版，用来展示个人简介、项目、近况与联系方式。"
+    content="复旦软件工程本科、哥伦比亚大学电子工程硕士。这里记录摄影、钢琴、徒步、工作区与夜空观察的现场。"
   >
-  <title>eicc27 | Personal Homepage</title>
+  <title>eicc27 | Field Notes</title>
+  <link
+    rel="icon"
+    href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="%230f151d"/><circle cx="22" cy="22" r="6" fill="%23f45a23"/><path d="M18 44L30 32L38 40L48 26" stroke="%23f7f0e5" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Bodoni+Moda:opsz,wght@6..96,600;700&family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;800&family=Oxanium:wght@500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
     rel="stylesheet"
   >
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="timelapse-stopwatch.css">
 </head>
 <body>
   <div class="page-shell">
-    <header class="hero">
-      <nav class="topbar">
-        <a class="brand" href="#top">eicc27</a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-          菜单
-        </button>
-        <div class="nav-links" id="site-nav">
-          <a href="#about">关于我</a>
-          <a href="#projects">项目</a>
-          <a href="#timeline">近况</a>
-          <a href="#contact">联系</a>
-        </div>
+    <header class="topbar">
+      <a class="brand" href="#top">
+        <span class="brand-mark">eicc27</span>
+        <span class="brand-note">field notes</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        菜单
+      </button>
+      <nav class="nav-links" id="site-nav" aria-label="主导航">
+        <a href="#about">简介</a>
+        <a href="#studio">兴趣 / Studio</a>
+        <a href="#frames">摄影</a>
+        <a href="#immersive">Immersive</a>
       </nav>
-
-      <div class="hero-grid" id="top">
-        <section class="hero-copy reveal">
-          <p class="eyebrow">GitHub Pages Starter</p>
-          <h1>把这里变成你的数字名片。</h1>
-          <p class="hero-text">
-            这是一个为 GitHub 个人主页准备的初版框架。现在它已经能作为首页上线，后续你只需要替换文案、
-            项目链接和个人信息，就能逐步扩成完整作品集。
-          </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#projects">查看页面结构</a>
-            <a class="button button-secondary" href="https://github.com/eicc27" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-          </div>
-        </section>
-
-        <aside class="hero-card reveal" aria-label="intro card">
-          <p class="card-label">Now</p>
-          <h2>正在搭建个人主页</h2>
-          <p>
-            这一版先把整体骨架、视觉风格和内容区块准备好，后面可以继续往里填：
-            自我介绍、代表项目、技能栈、博客入口，或者任何你想让别人第一眼看到的内容。
-          </p>
-          <ul class="quick-list">
-            <li>仓库：<span>eicc27/eicc27.github.io</span></li>
-            <li>类型：<span>纯静态站点</span></li>
-            <li>部署：<span>GitHub Pages</span></li>
-          </ul>
-        </aside>
-      </div>
     </header>
 
-    <main>
-      <section class="section reveal" id="about">
-        <div class="section-heading">
-          <p class="eyebrow">About</p>
-          <h2>一个适合继续扩展的首页起点</h2>
-        </div>
-        <div class="about-grid">
-          <article class="panel">
-            <h3>你可以在这里写什么</h3>
-            <p>
-              简短介绍你的身份、方向和你关心的东西。比如你是前端开发、后端开发、游戏爱好者、
-              学习中的学生，或者正在做某个长期项目。页面现在已经预留了足够自然的展示结构。
-            </p>
-          </article>
-          <article class="panel emphasis">
-            <h3>建议优先补充</h3>
-            <p>
-              个人一句话介绍、3 个代表项目、一个可以联系到你的入口。这三样内容补上以后，
-              这个主页就已经足够对外展示。
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section reveal" id="projects">
-        <div class="section-heading">
-          <p class="eyebrow">Projects</p>
-          <h2>先把项目位留出来</h2>
-        </div>
-        <div class="cards-grid">
-          <article class="project-card">
-            <p class="project-tag">Featured 01</p>
-            <h3>项目名称占位</h3>
-            <p>
-              在这里写一句项目介绍，例如它解决了什么问题、你用了什么技术、或者它最值得看的部分是什么。
-            </p>
-            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
-          </article>
-          <article class="project-card">
-            <p class="project-tag">Featured 02</p>
-            <h3>作品 / 仓库占位</h3>
-            <p>
-              如果你后面想展示博客、脚本、小工具或课程作业，也可以直接沿用这一张卡片的结构继续扩展。
-            </p>
-            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
-          </article>
-          <article class="project-card">
-            <p class="project-tag">Featured 03</p>
-            <h3>长期进行中的内容</h3>
-            <p>
-              比如你的学习路线、游戏相关内容、个人实验、设计稿整理，或者任何你想持续更新的东西。
-            </p>
-            <a href="https://github.com/eicc27" target="_blank" rel="noreferrer">放项目链接</a>
-          </article>
-        </div>
-      </section>
-
-      <section class="section reveal" id="timeline">
-        <div class="section-heading">
-          <p class="eyebrow">Timeline</p>
-          <h2>把“最近在做什么”也展示出来</h2>
-        </div>
-        <div class="timeline">
-          <article class="timeline-item">
-            <span class="timeline-dot" aria-hidden="true"></span>
-            <div>
-              <p class="timeline-date">Step 01</p>
-              <h3>完成个人主页基础结构</h3>
-              <p>首页、视觉风格、移动端布局和基础交互已经准备好，可以直接继续填内容。</p>
-            </div>
-          </article>
-          <article class="timeline-item">
-            <span class="timeline-dot" aria-hidden="true"></span>
-            <div>
-              <p class="timeline-date">Step 02</p>
-              <h3>替换成你的真实资料</h3>
-              <p>把名字、介绍、项目卡片、联系方式换成真实内容，这个站点就会立刻更完整。</p>
-            </div>
-          </article>
-          <article class="timeline-item">
-            <span class="timeline-dot" aria-hidden="true"></span>
-            <div>
-              <p class="timeline-date">Step 03</p>
-              <h3>后续可继续加页面</h3>
-              <p>如果你想加博客列表、相册、简历页或作品详情页，也可以在当前结构上继续扩展。</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section contact reveal" id="contact">
-        <div class="section-heading">
-          <p class="eyebrow">Contact</p>
-          <h2>把一个明确入口留给访问者</h2>
-        </div>
-        <div class="contact-panel">
-          <p>
-            这一块建议你至少保留一个长期可用的联系方式，比如 GitHub、邮箱或社交主页。
-            现在我先把 GitHub 入口放好，后面你可以继续补。
+    <main class="site-main" id="top">
+      <section class="hero">
+        <div class="hero-copy reveal reveal-group">
+          <p class="eyebrow">Fudan SE · Columbia EE · Field Notes</p>
+          <div class="hero-marquee" aria-hidden="true">
+            <span class="hero-marquee-track">
+              Photography · Piano · Hiking · Night Walks · Photography · Piano · Hiking · Night Walks ·
+            </span>
+          </div>
+          <h1>
+            在代码、镜头和琴键之间，
+            <span>把旅途里的光收进同一页。</span>
+          </h1>
+          <p class="hero-text">
+            本科在复旦学习软件工程，硕士在哥伦比亚大学学习电子工程。平时拍照、弹钢琴、徒步，也持续记录城市夜色、
+            山路、鸟类、工作区和夜空。这一页把这些线索收成一份可以继续生长的 field notes。
           </p>
-          <div class="contact-links">
-            <a class="button button-primary" href="https://github.com/eicc27" target="_blank" rel="noreferrer">
-              打开 GitHub
-            </a>
-            <a class="button button-secondary" href="mailto:hello@example.com">
-              替换成你的邮箱
-            </a>
+          <div class="hero-actions">
+            <a class="pill pill-primary" href="#about">认识我</a>
+            <a class="pill pill-ghost" href="#frames">浏览摄影</a>
+          </div>
+          <ul class="hero-tags" aria-label="个人线索">
+            <li>Fudan · Software Engineering</li>
+            <li>Columbia · Electronic Engineering</li>
+            <li>Photography · Piano</li>
+            <li>Hiking · Night Notes</li>
+          </ul>
+        </div>
+
+        <div class="hero-grid reveal reveal-group" aria-label="首屏主题卡片">
+          <article class="hero-card hero-card--portrait-primary" data-photo-hero-card="portraitPrimary">
+            <div
+              class="hero-card-art hero-card-art--photo hero-card-art--portrait-primary"
+              data-photo-hero-art
+              aria-hidden="true"
+            >
+              <span class="hero-card-art-badge" data-photo-hero-badge>Portrait / current frame</span>
+            </div>
+            <div class="hero-card-copy">
+              <p class="hero-card-tag" data-photo-hero-tag>Portraits</p>
+              <h2 data-photo-hero-title>人物照片</h2>
+              <p data-photo-hero-body>城市光线里的人物现场。</p>
+            </div>
+            <a class="hero-card-link" data-photo-hero-link href="#frames">浏览照片</a>
+          </article>
+
+          <article class="hero-card hero-card--portrait-story" data-photo-hero-card="portraitSecondary">
+            <div
+              class="hero-card-art hero-card-art--photo hero-card-art--portrait-story"
+              data-photo-hero-art
+              aria-hidden="true"
+            >
+              <span class="hero-card-art-badge" data-photo-hero-badge>Portrait / current frame</span>
+            </div>
+            <div class="hero-card-copy">
+              <p class="hero-card-tag" data-photo-hero-tag>Portraits</p>
+              <h2 data-photo-hero-title>人物照片</h2>
+              <p data-photo-hero-body>旅途中被留下的一次安静停顿。</p>
+            </div>
+            <a class="hero-card-link" data-photo-hero-link href="#frames">浏览照片</a>
+          </article>
+
+          <article class="hero-card hero-card--scenery" data-photo-hero-card="sceneryPrimary">
+            <div
+              class="hero-card-art hero-card-art--photo hero-card-art--scenery"
+              data-photo-hero-art
+              aria-hidden="true"
+            >
+              <span class="hero-card-art-badge" data-photo-hero-badge>Scenery / current frame</span>
+            </div>
+            <div class="hero-card-copy">
+              <p class="hero-card-tag" data-photo-hero-tag>Scenery</p>
+              <h2 data-photo-hero-title>风景照片</h2>
+              <p data-photo-hero-body>在路上的日出、港湾与城市光线。</p>
+            </div>
+            <a class="hero-card-link" data-photo-hero-link href="#frames">浏览照片</a>
+          </article>
+
+          <article class="hero-card hero-card--scenery-alt" data-photo-hero-card="scenerySecondary">
+            <div
+              class="hero-card-art hero-card-art--photo hero-card-art--scenery-alt"
+              data-photo-hero-art
+              aria-hidden="true"
+            >
+              <span class="hero-card-art-badge" data-photo-hero-badge>Scenery / current frame</span>
+            </div>
+            <div class="hero-card-copy">
+              <p class="hero-card-tag" data-photo-hero-tag>Scenery</p>
+              <h2 data-photo-hero-title>风景照片</h2>
+              <p data-photo-hero-body>山脊、海湾和旅途中遇到的现场。</p>
+            </div>
+            <a class="hero-card-link" data-photo-hero-link href="#frames">浏览照片</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section about reveal" id="about">
+        <div class="section-heading">
+          <p class="eyebrow">01 / About</p>
+          <h2>复旦的软件工程训练和哥大的电子工程视角，最后都落回镜头、琴键与山路。</h2>
+          <p class="section-note">
+            这里不是一页只讲学历的简历摘要，而是一份更接近本人气质的简介：技术提供结构，摄影和音乐负责表达，
+            徒步把视角重新带回现场。
+          </p>
+        </div>
+
+        <div class="about-grid reveal reveal-group">
+          <div class="portrait-stage">
+            <div class="portrait-frame" data-about-photo-frame>
+              <span class="frame-watermark" data-about-photo-watermark>featured portrait / field notes</span>
+              <div class="portrait-figure" data-about-photo-figure aria-hidden="true"></div>
+              <div class="portrait-glow portrait-glow--one" aria-hidden="true"></div>
+              <div class="portrait-glow portrait-glow--two" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="about-copy">
+            <p class="section-label">Profile</p>
+            <h3>我用代码组织信息，也用摄影、钢琴和徒步记录生活的节奏。</h3>
+            <p>
+              本科在复旦学习软件工程，硕士在 Columbia 学习电子工程。摄影让我持续观察城市夜色、旅行与自然现场；
+              钢琴和监听系统把注意力拉回声音、空间与细节；徒步则提供一种更慢、更稳定的观看方式。
+              这个主页最终想做的，就是把这些彼此相关的兴趣并排展开。
+            </p>
+            <div class="about-facts">
+              <div>
+                <span class="fact-label">Featured Frame</span>
+                <strong data-about-photo-title>Featured portrait</strong>
+              </div>
+              <div>
+                <span class="fact-label">Undergrad</span>
+                <strong>Fudan · Software Engineering</strong>
+              </div>
+              <div>
+                <span class="fact-label">Graduate</span>
+                <strong>Columbia · Electronic Engineering</strong>
+              </div>
+              <div>
+                <span class="fact-label">Interests</span>
+                <strong>Photography · Piano · Hiking</strong>
+              </div>
+            </div>
+            <ul class="about-pills">
+              <li>城市与旅行摄影</li>
+              <li>钢琴与听音空间</li>
+              <li>徒步与步道观察</li>
+              <li>夜景 / 鸟类 / 深空</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section studio reveal" id="studio">
+        <div class="studio-inner studio-inner--intro">
+          <div class="section-heading">
+            <p class="eyebrow">02 / Interests / Studio</p>
+            <h2>钢琴和监听是另一条主线，不是附属装饰。</h2>
+            <p class="section-note">
+              除了摄影和徒步，平时也会把钢琴、监听和房间校准当作持续打磨的工作区。这里用空间图和读数，
+              把这套 setup 的逻辑讲清楚。
+            </p>
+          </div>
+        </div>
+
+        <div class="studio-scroll-shell" data-studio-scroll>
+          <div class="studio-stage" data-studio-stage>
+            <div class="studio-stage-sticky">
+              <article class="studio-map" data-studio-map aria-label="Honeycomb studio map">
+                <div class="studio-map-light" data-studio-map-light aria-hidden="true"></div>
+                <div class="studio-space">
+                  <div class="studio-space-light" data-studio-space-light aria-hidden="true"></div>
+                  <canvas class="studio-canvas" id="studio-canvas" aria-hidden="true"></canvas>
+                </div>
+
+                <div class="studio-hovercard" data-studio-hover hidden>
+                  <p class="studio-hovercard__eyebrow" data-studio-hover-eyebrow></p>
+                  <strong class="studio-hovercard__title" data-studio-hover-title></strong>
+                  <p class="studio-hovercard__detail" data-studio-hover-detail></p>
+                  <div class="studio-hovercard__meta" data-studio-hover-meta></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-inner studio-inner--readout">
+          <div class="studio-readout reveal reveal-group">
+            <article class="panel panel--studio studio-story-card">
+              <div class="studio-story-head">
+                <div class="studio-story-copy">
+                  <p class="panel-tag">Actual Setup / 2.1</p>
+                  <h3>Genelec 8330A + 7350A + SL GRAND 88</h3>
+                </div>
+                <span class="studio-readout-badge">GLM snapshot · 2026-03-16</span>
+              </div>
+
+              <p class="studio-body">
+                这块不是概念图，而是你现在真实在用的 2.1 工作区：一对 Genelec 8330A 负责左右声像，SL GRAND 88 占住中轴，
+                Left Side 7350A 把低频往下补到底。上面的 honeycomb map 负责把摆位讲清楚，下面这组 readout 则把房间、
+                校准和左右声道状态讲完整。
+              </p>
+
+              <div class="studio-setup-strip">
+                <article class="studio-node studio-node--left">
+                  <strong>Left 8330A</strong>
+                  <span>-10.4 dB · 45.1 Hz</span>
+                </article>
+                <article class="studio-node studio-node--center">
+                  <strong>SL GRAND 88</strong>
+                  <span>center axis / key focus</span>
+                </article>
+                <article class="studio-node studio-node--right">
+                  <strong>Right 8330A</strong>
+                  <span>-10.1 dB · 54.5 Hz</span>
+                </article>
+                <article class="studio-node studio-node--sub">
+                  <strong>7350A</strong>
+                  <span>18.9 Hz · mode 27.6 Hz</span>
+                </article>
+                <article class="studio-node studio-node--focus">
+                  <strong>Listening spot</strong>
+                  <span>ORR 89 / 97%</span>
+                </article>
+              </div>
+
+              <ul class="studio-story-pills">
+                <li>Singlepoint AutoCal2</li>
+                <li>Room 4.50 × 6.00 × 2.50 m</li>
+                <li>RT60 mean 0.25 s</li>
+                <li>Low-end extension to 18.9 Hz</li>
+              </ul>
+            </article>
+
+            <div class="studio-data-stack">
+              <article class="panel studio-room-card">
+                <div class="studio-card-head">
+                  <div>
+                    <p class="panel-tag">Room / Calibration</p>
+                    <h3>这次 GLM 读数说明的是一个已经成形的房间，而不是 demo setup。</h3>
+                  </div>
+                  <span class="studio-card-stamp">Singlepoint AutoCal2</span>
+                </div>
+
+                <div class="studio-metric-grid">
+                  <article class="studio-metric">
+                    <span>Room size</span>
+                    <strong>4.50 × 6.00 × 2.50 m</strong>
+                  </article>
+                  <article class="studio-metric">
+                    <span>RT60 mean</span>
+                    <strong>0.25 s</strong>
+                  </article>
+                  <article class="studio-metric">
+                    <span>Main room modes</span>
+                    <strong>47.2 / 106.2 / 146.1 Hz</strong>
+                  </article>
+                  <article class="studio-metric">
+                    <span>Sub mode</span>
+                    <strong>27.6 Hz</strong>
+                  </article>
+                </div>
+              </article>
+
+              <article class="panel studio-channel-card">
+                <div class="studio-card-head">
+                  <div>
+                    <p class="panel-tag">Monitor Balance</p>
+                    <h3>左右主监听已经被拉到非常接近，右侧略干净，左侧需要一点 ToF 修正。</h3>
+                  </div>
+                </div>
+
+                <div class="studio-channel-grid">
+                  <article class="studio-channel studio-channel--left">
+                    <span class="studio-channel__name">Left 8330A</span>
+                    <strong class="studio-channel__primary">-10.4 dB</strong>
+                    <span class="studio-channel__secondary">ToF +0.2 ms · ORR 89%</span>
+                    <span class="studio-channel__meta">Low cutoff -6 dB @ 45.1 Hz</span>
+                  </article>
+
+                  <article class="studio-channel studio-channel--right">
+                    <span class="studio-channel__name">Right 8330A</span>
+                    <strong class="studio-channel__primary">-10.1 dB</strong>
+                    <span class="studio-channel__secondary">ToF 0.0 ms · ORR 97%</span>
+                    <span class="studio-channel__meta">Low cutoff -6 dB @ 54.5 Hz</span>
+                  </article>
+
+                  <article class="studio-channel studio-channel--sub">
+                    <span class="studio-channel__name">7350A Sub</span>
+                    <strong class="studio-channel__primary">0.0 dB</strong>
+                    <span class="studio-channel__secondary">Low cutoff -6 dB @ 18.9 Hz</span>
+                    <span class="studio-channel__meta">Best watched around 27.6 Hz</span>
+                  </article>
+                </div>
+              </article>
+
+              <article class="panel studio-mode-card">
+                <div class="studio-card-head">
+                  <div>
+                    <p class="panel-tag">Working Notes</p>
+                    <h3>实际使用时最值得盯的是中轴、左右 trim 接近度，以及低频模式点。</h3>
+                  </div>
+                </div>
+
+                <p class="studio-body">
+                  这套摆位的重点不是把器材堆满，而是让钢琴、监听和听音位三者沿同一条中心线工作。GLM 结果里左右 trim 只差
+                  0.3 dB，说明主声像已经比较稳；真正需要长期记住的是 47.2 / 106.2 / 146.1 Hz 这些房间模式，以及 sub 在
+                  27.6 Hz 这一带的行为。
+                </p>
+
+                <div class="studio-mode-band">
+                  <span>centered keyboard line</span>
+                  <span>stable L/R image</span>
+                  <span>watch 47.2 Hz</span>
+                  <span>watch 106.2 Hz</span>
+                  <span>watch 146.1 Hz</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section frames reveal" id="frames">
+        <div class="section-heading">
+          <p class="eyebrow">03 / Frames</p>
+          <h2>人物和风景都已经按现有照片重建成两套可浏览的 deck。</h2>
+          <p class="section-note">
+            这一页只使用当前目录里的真实照片数据；标题、caption 和卡片内容都已经按现有素材重新整理。
+          </p>
+        </div>
+
+        <div class="photo-deck-list reveal reveal-group" data-photo-decks></div>
+
+        <article class="photo-wall-shell reveal">
+          <div class="photo-wall-heading">
+            <p class="panel-tag" data-photo-total-count>All Frames / 00</p>
+            <h3>deck 负责按组浏览，wall 负责把整套照片的节奏一次铺开。</h3>
+            <p data-photo-total-summary>
+              点任意一张都能进入浏览器，从当前照片继续往前后翻。
+            </p>
+          </div>
+          <div class="photo-wall" data-photo-wall aria-label="All portraits and scenery photos"></div>
+        </article>
+      </section>
+
+      <section class="section birds reveal" id="birds">
+        <div class="section-heading">
+          <p class="eyebrow">04 / Bird Atlas</p>
+          <h2>鸟类部分保留为一套独立的 atlas 浏览器。</h2>
+          <p class="section-note">
+            这组继续保留物种名称、IUCN 等级和拍摄参数，作为风景之外的另一条观察线。
+          </p>
+        </div>
+
+        <button
+          class="bird-tab reveal"
+          type="button"
+          data-bird-tab
+          aria-controls="bird-gallery"
+          aria-haspopup="dialog"
+        >
+          <span class="bird-tab-deck" data-bird-tab-deck aria-hidden="true"></span>
+          <div class="bird-tab-copy">
+            <span class="bird-tab-kicker">Bird Atlas / field guide</span>
+            <strong class="bird-tab-title">鸟类图鉴</strong>
+            <span class="bird-tab-text">
+              先看牌组预览，再进入完整浏览器。这里保留物种信息、保护等级和器材记录，读法更像一册现场图鉴。
+            </span>
+            <div class="bird-tab-footer">
+              <span class="bird-tab-count" data-bird-count>鸟类牌组载入中...</span>
+            </div>
+          </div>
+        </button>
+      </section>
+
+      <section class="section timelapse" id="timelapse">
+        <div class="timelapse-stopwatch" data-timelapse-root data-timelapse-state="idle">
+          <div class="timelapse-invert-wash" data-timelapse-invert aria-hidden="true"></div>
+
+          <div class="timelapse-scroll-shell" data-timelapse-scroll>
+            <div class="timelapse-stage" data-timelapse-stage>
+              <div class="timelapse-stage-sticky">
+                <div class="timelapse-story" data-timelapse-story>
+                  <p class="eyebrow">05 / Sunset Atlas</p>
+                  <h2>把重庆的日落装进一枚秒表。</h2>
+                  <p class="section-note">
+                    这里只保留一条可以回看的时间线。滚动到秒表完全展开后，可用空格开始或暂停，按 R 倒带，
+                    暂停后可以打开这一秒的定格帧。
+                  </p>
+                </div>
+
+                <div class="timelapse-media" data-timelapse-media aria-label="重庆日落延时与秒表叙事">
+                  <button
+                    class="timelapse-panel timelapse-panel--city-a"
+                    type="button"
+                    data-timelapse-segment
+                    aria-label="查看重庆定格帧"
+                  >
+                    <img
+                      class="timelapse-panel__poster"
+                      src="videos/web/chongqing-sunset-1080p.jpg"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      aria-hidden="true"
+                    >
+                    <video
+                      class="timelapse-panel__video"
+                      data-timelapse-video
+                      data-src="videos/web/chongqing-sunset-1080p.mp4"
+                      poster="videos/web/chongqing-sunset-1080p.jpg"
+                      muted
+                      playsinline
+                      preload="none"
+                      disablepictureinpicture
+                    ></video>
+                    <img
+                      class="timelapse-panel__freeze"
+                      data-timelapse-freeze-preview
+                      alt=""
+                      decoding="async"
+                      aria-hidden="true"
+                    >
+                    <span class="timelapse-panel__index" aria-hidden="true">重庆 / 01</span>
+                    <span class="timelapse-panel__shade" aria-hidden="true"></span>
+                    <span class="timelapse-panel__label">
+                      <strong>重庆</strong>
+                      <span>mountain dusk</span>
+                    </span>
+                  </button>
+
+                  <span class="timelapse-media__veil" aria-hidden="true"></span>
+                </div>
+
+                <div class="timelapse-chronograph">
+                  <div class="timelapse-watchcase" aria-hidden="true">
+                    <span class="timelapse-watchcase__loop"></span>
+                    <span class="timelapse-watchcase__crown"></span>
+                  </div>
+
+                  <svg class="timelapse-ring" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle
+                      class="timelapse-ring__arc"
+                      cx="50"
+                      cy="50"
+                      r="49"
+                      fill="none"
+                      pathLength="1"
+                      stroke-linecap="round"
+                      transform="rotate(90 50 50)"
+                    ></circle>
+                  </svg>
+
+                  <div class="timelapse-ring__ticks" aria-hidden="true"></div>
+
+                  <div class="timelapse-counter" aria-live="off">
+                    <span class="timelapse-counter__ghost" data-timelapse-seconds-ghost>15</span>
+                    <span class="timelapse-counter__fill" data-timelapse-seconds>15</span>
+                    <span class="timelapse-counter__detail" data-timelapse-time>00:15.00</span>
+                  </div>
+
+                  <div class="timelapse-hand" data-timelapse-hand aria-hidden="true">
+                    <span class="timelapse-hand__shaft"></span>
+                    <span class="timelapse-hand__hub"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timelapse-freeze" data-timelapse-lightbox hidden aria-hidden="true" role="dialog" aria-modal="true">
+            <button class="timelapse-freeze__backdrop" type="button" data-timelapse-lightbox-close aria-label="Close freeze frame"></button>
+
+            <div class="timelapse-freeze__sheet" data-timelapse-lightbox-sheet>
+              <div class="timelapse-freeze__viewer-card">
+                <div class="timelapse-freeze__frame-surface">
+                  <div class="timelapse-freeze__photo-wrap">
+                    <figure class="timelapse-freeze__figure">
+                      <div class="timelapse-freeze__photo-card" data-timelapse-lightbox-card>
+                        <span class="timelapse-freeze__photo-light" data-timelapse-lightbox-light aria-hidden="true"></span>
+                        <img class="timelapse-freeze__image" data-timelapse-lightbox-image alt="">
+                      </div>
+                      <figcaption class="timelapse-freeze__caption">
+                        <strong data-timelapse-lightbox-title>Freeze frame</strong>
+                        <span data-timelapse-lightbox-time>00:00.00</span>
+                      </figcaption>
+                    </figure>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section immersive" id="immersive">
+        <div class="immersive-inner reveal">
+          <div class="section-heading">
+            <p class="eyebrow">06 / Immersive</p>
+            <h2>把深空留在页面的最后一段。</h2>
+            <p class="section-note">
+              这里连接星图标注、摄影入口和更沉浸的夜空氛围，让页面最后仍然落回观察与漫游。
+            </p>
+          </div>
+        </div>
+
+        <div class="immersive-scroll-shell reveal" data-immersive-scroll>
+          <div class="immersive-stage-shell" data-immersive-stage data-immersive-preview>
+            <div class="immersive-stage-sticky">
+              <div class="immersive-stage" data-immersive-surface>
+                <canvas class="immersive-preview-canvas" id="immersive-preview-canvas" aria-hidden="true"></canvas>
+
+                <div class="immersive-photo-field" data-immersive-field aria-label="Atlas photo field">
+                  <article class="immersive-photo immersive-photo--orion" data-immersive-photo>
+                    <span class="immersive-photo-card">
+                      <span class="immersive-photo-visual"></span>
+                      <span class="immersive-photo-caption">
+                        <span class="immersive-photo-tag">Orion Nebula</span>
+                        <strong>深空样张</strong>
+                      </span>
+                    </span>
+                  </article>
+
+                  <article class="immersive-photo immersive-photo--portrait" data-immersive-photo>
+                    <span class="immersive-photo-card">
+                      <span class="immersive-photo-visual"></span>
+                      <span class="immersive-photo-caption">
+                        <span class="immersive-photo-tag">Portraits</span>
+                        <strong>人物与生活</strong>
+                      </span>
+                    </span>
+                  </article>
+
+                  <article class="immersive-photo immersive-photo--sunset" data-immersive-photo>
+                    <span class="immersive-photo-card">
+                      <span class="immersive-photo-visual"></span>
+                      <span class="immersive-photo-caption">
+                        <span class="immersive-photo-tag">Sunsets</span>
+                        <strong>时间切片</strong>
+                      </span>
+                    </span>
+                  </article>
+
+                  <article class="immersive-photo immersive-photo--studio" data-immersive-photo>
+                    <span class="immersive-photo-card">
+                      <span class="immersive-photo-visual"></span>
+                      <span class="immersive-photo-caption">
+                        <span class="immersive-photo-tag">Studio</span>
+                        <strong>工作区回声</strong>
+                      </span>
+                    </span>
+                  </article>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>&copy; <span id="year"></span> eicc27. Built for GitHub Pages.</p>
+      <p>&copy; <span id="year"></span> eicc27. Field notes on photography, piano, hiking, and a future night atlas.</p>
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <div
+    class="photo-gallery bird-gallery"
+    data-photo-gallery
+    aria-hidden="true"
+    hidden
+  >
+    <div class="photo-gallery__backdrop bird-gallery-backdrop" data-photo-gallery-close></div>
+    <div class="photo-gallery__shell bird-gallery-shell">
+      <div class="photo-gallery__topbar bird-gallery-topbar">
+        <div class="photo-gallery__heading bird-gallery-heading">
+          <span class="photo-gallery__kicker bird-gallery-kicker" data-photo-gallery-kicker>Photo deck</span>
+          <strong class="photo-gallery__position bird-gallery-position" data-photo-gallery-position>1 / 1</strong>
+          <span class="photo-gallery__current bird-gallery-current" data-photo-gallery-current>loading...</span>
+        </div>
+        <button class="photo-gallery__close bird-gallery-close" type="button" data-photo-gallery-close>
+          Close
+        </button>
+      </div>
+
+      <div class="photo-gallery__carousel bird-gallery-carousel">
+        <button
+          class="photo-gallery__nav photo-gallery__nav--prev bird-gallery-side bird-gallery-side--prev"
+          type="button"
+          data-photo-gallery-prev
+        >
+          <span class="photo-gallery__nav-media bird-gallery-side__media">
+            <img class="bird-gallery-side__image" data-photo-gallery-prev-image alt="">
+          </span>
+          <span class="photo-gallery__nav-caption bird-gallery-side__caption" data-photo-gallery-prev-label>
+            Previous
+          </span>
+        </button>
+
+        <article class="photo-gallery__viewer bird-gallery-viewer" data-photo-gallery-viewer>
+          <div class="photo-gallery__viewer-card bird-gallery-viewer-card" data-photo-gallery-viewer-card>
+            <div class="photo-gallery__frame-surface bird-gallery-frame-surface">
+              <div class="photo-gallery__meta-head bird-gallery-meta-head">
+                <div class="photo-gallery__species bird-gallery-species">
+                  <span
+                    class="photo-gallery__meta-kicker bird-gallery-species__eyebrow"
+                    data-photo-gallery-meta-kicker
+                  >
+                    Collection
+                  </span>
+                  <strong class="photo-gallery__title bird-gallery-species__title" data-photo-gallery-title>...</strong>
+                  <span class="photo-gallery__caption" data-photo-gallery-caption>...</span>
+                </div>
+
+                <div class="photo-gallery__deck-panel">
+                  <span class="photo-gallery__deck-label">Photo deck</span>
+                  <strong class="photo-gallery__deck-count" data-photo-gallery-count>1 photo in stack</strong>
+                </div>
+              </div>
+
+              <div
+                class="photo-gallery__photo-wrap bird-gallery-photo-wrap"
+                data-photo-gallery-photo-wrap
+              >
+                <div
+                  class="photo-gallery__photo-card bird-gallery-photo-card"
+                  data-photo-gallery-photo-card
+                >
+                  <span
+                    class="photo-gallery__photo-light bird-gallery-photo-light"
+                    data-photo-gallery-photo-light
+                    aria-hidden="true"
+                  ></span>
+                  <img class="photo-gallery__image bird-gallery-photo" data-photo-gallery-image alt="">
+                  <div
+                    class="photo-gallery__annotation-layer astro-overlay"
+                    data-photo-gallery-annotation-layer
+                    aria-hidden="true"
+                    hidden
+                  ></div>
+                </div>
+              </div>
+
+              <div class="photo-gallery__meta-strip bird-gallery-meta-strip">
+                <div class="photo-gallery__meta-line bird-gallery-meta-line photo-gallery__meta-line--summary">
+                  <div class="photo-gallery__meta-inline bird-meta-inline">
+                    <span>Collection</span>
+                    <strong data-photo-gallery-deck-title>...</strong>
+                  </div>
+                  <div class="photo-gallery__meta-inline bird-meta-inline">
+                    <span>Frame</span>
+                    <strong data-photo-gallery-frame-title>...</strong>
+                  </div>
+                </div>
+
+                <div
+                  class="photo-gallery__meta-line bird-gallery-meta-line photo-gallery__meta-line--tags"
+                  data-photo-gallery-tags
+                ></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <button
+          class="photo-gallery__nav photo-gallery__nav--next bird-gallery-side bird-gallery-side--next"
+          type="button"
+          data-photo-gallery-next
+        >
+          <span class="photo-gallery__nav-media bird-gallery-side__media">
+            <img class="bird-gallery-side__image" data-photo-gallery-next-image alt="">
+          </span>
+          <span class="photo-gallery__nav-caption bird-gallery-side__caption" data-photo-gallery-next-label>
+            Next
+          </span>
+        </button>
+      </div>
+
+      <div class="photo-gallery__thumbs bird-gallery-thumbs" data-photo-gallery-thumbs></div>
+    </div>
+  </div>
+
+  <div
+    class="bird-gallery"
+    id="bird-gallery"
+    data-bird-gallery
+    aria-hidden="true"
+    hidden
+  >
+    <div class="bird-gallery-backdrop" data-bird-gallery-close></div>
+    <div class="bird-gallery-shell">
+      <div class="bird-gallery-topbar">
+        <div class="bird-gallery-heading">
+          <span class="bird-gallery-kicker">Bird atlas</span>
+          <strong class="bird-gallery-position" data-bird-position>1 / 10</strong>
+          <span class="bird-gallery-current" data-bird-current-label>loading...</span>
+        </div>
+        <button class="bird-gallery-close" type="button" data-bird-gallery-close>
+          Close
+        </button>
+      </div>
+
+      <div class="bird-gallery-carousel">
+        <button class="bird-gallery-side bird-gallery-side--prev" type="button" data-bird-prev>
+          <span class="bird-gallery-side__media">
+            <img class="bird-gallery-side__image" data-bird-prev-image alt="">
+          </span>
+          <span class="bird-gallery-side__caption" data-bird-prev-title>Previous</span>
+        </button>
+
+        <article class="bird-gallery-viewer" data-bird-viewer>
+          <div class="bird-gallery-viewer-card" data-bird-viewer-card>
+            <div class="bird-gallery-frame-surface" data-bird-frame-surface>
+              <div class="bird-gallery-meta-head">
+                <div class="bird-gallery-species">
+                  <span class="bird-gallery-species__eyebrow">Species</span>
+                  <strong class="bird-gallery-species__title" data-bird-meta-title>...</strong>
+                  <span class="bird-gallery-species__latin" data-bird-scientific>...</span>
+                </div>
+                <div class="bird-gallery-iucn-panel">
+                  <span class="bird-gallery-iucn-label">IUCN Red List</span>
+                  <div class="bird-iucn-scale bird-iucn-scale--detail" data-bird-iucn-badge></div>
+                </div>
+              </div>
+
+              <div class="bird-gallery-photo-wrap" data-bird-photo-wrap>
+                <div class="bird-gallery-photo-card" data-bird-photo-card>
+                  <span class="bird-gallery-photo-light" data-bird-photo-light aria-hidden="true"></span>
+                  <img class="bird-gallery-photo" data-bird-main-image alt="">
+                </div>
+              </div>
+
+              <div class="bird-gallery-meta-strip">
+                <div class="bird-gallery-meta-line bird-gallery-meta-line--brands">
+                  <div class="bird-meta-inline bird-meta-inline--camera">
+                    <span>Camera</span>
+                    <strong data-bird-meta-camera>...</strong>
+                  </div>
+                  <div class="bird-meta-inline bird-meta-inline--lens">
+                    <span>Lens</span>
+                    <strong data-bird-meta-lens>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>Shot At</span>
+                    <strong data-bird-meta-captured-at>...</strong>
+                  </div>
+                </div>
+
+                <div class="bird-gallery-meta-line bird-gallery-meta-line--capture">
+                  <div class="bird-meta-inline">
+                    <span>Aperture</span>
+                    <strong data-bird-meta-aperture>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>Shutter</span>
+                    <strong data-bird-meta-shutter>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>ISO</span>
+                    <strong data-bird-meta-iso>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>Dimensions</span>
+                    <strong data-bird-meta-dimensions>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>Focal Length</span>
+                    <strong data-bird-meta-focal-length>...</strong>
+                  </div>
+                  <div class="bird-meta-inline">
+                    <span>35mm Eq.</span>
+                    <strong data-bird-meta-focal-length-35>...</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <button class="bird-gallery-side bird-gallery-side--next" type="button" data-bird-next>
+          <span class="bird-gallery-side__media">
+            <img class="bird-gallery-side__image" data-bird-next-image alt="">
+          </span>
+          <span class="bird-gallery-side__caption" data-bird-next-title>Next</span>
+        </button>
+      </div>
+
+      <div class="bird-gallery-thumbs" data-bird-thumbs></div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>

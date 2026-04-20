@@ -1,0 +1,1311 @@
+.section.timelapse {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0;
+  overflow: clip;
+  background: transparent;
+}
+
+.timelapse-stopwatch {
+  --timelapse-scroll-progress: 0;
+  --timelapse-playback-progress: 0;
+  --timelapse-ring-dash: 0.78;
+  --timelapse-view-scale: 2.42;
+  --timelapse-view-x: 0px;
+  --timelapse-view-y: 56vh;
+  --timelapse-story-opacity: 1;
+  --timelapse-story-shift: 0px;
+  --timelapse-video-opacity: 0;
+  --timelapse-video-scale: 1.08;
+  --timelapse-video-shift: 0px;
+  --timelapse-vignette-opacity: 0.72;
+  --timelapse-ticks-opacity: 0.28;
+  --timelapse-counter-ghost-opacity: 0;
+  --timelapse-counter-fill-opacity: 0;
+  --timelapse-counter-scale: 0.94;
+  --timelapse-counter-shift: 72px;
+  --timelapse-detail-opacity: 0;
+  --timelapse-hand-opacity: 0;
+  --timelapse-hand-angle: -126deg;
+  --timelapse-button-opacity: 0;
+  --timelapse-case-opacity: 0;
+  --timelapse-hud-opacity: 0;
+  --timelapse-label-opacity: 0;
+  --timelapse-divider-opacity: 0;
+  --timelapse-surface: #f7f2ea;
+  --timelapse-surface-strong: rgba(247, 242, 234, 0.96);
+  --timelapse-ink: rgba(15, 16, 20, 0.96);
+  --timelapse-ink-soft: rgba(15, 16, 20, 0.68);
+  --timelapse-ghost-stroke: rgba(17, 18, 22, 0.1);
+  --timelapse-tick-color: rgba(17, 18, 22, 0.14);
+  --timelapse-accent: #ff591d;
+  --timelapse-accent-glow: rgba(255, 89, 29, 0.28);
+  --timelapse-metal-hi: #fafcfd;
+  --timelapse-metal-mid: #d7dce2;
+  --timelapse-metal-low: #a8afb8;
+  --timelapse-metal-shadow: rgba(8, 10, 14, 0.18);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  content-visibility: auto;
+  contain-intrinsic-size: 4200px;
+}
+
+.timelapse-stopwatch.is-scene-locked {
+  content-visibility: visible;
+  contain: none;
+}
+
+.timelapse-stopwatch::before,
+.timelapse-stopwatch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.timelapse-stopwatch::before {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(140, 168, 199, 0.08), transparent 22%),
+    radial-gradient(circle at 82% 76%, rgba(244, 90, 35, 0.1), transparent 26%),
+    linear-gradient(180deg, rgba(247, 242, 234, 0.98), rgba(240, 232, 218, 0.9) 54%, rgba(233, 224, 209, 0.84));
+}
+
+.timelapse-stopwatch::after {
+  background:
+    linear-gradient(rgba(17, 18, 22, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 18, 22, 0.028) 1px, transparent 1px);
+  background-size: 34px 34px;
+  opacity: 0.38;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.94), transparent 92%);
+}
+
+.timelapse-invert-wash {
+  position: fixed;
+  inset: 0;
+  z-index: 170;
+  pointer-events: none;
+  opacity: 0;
+  background: #f6f2eb;
+  mix-blend-mode: difference;
+  clip-path: circle(0px at var(--timelapse-invert-x, 50vw) var(--timelapse-invert-y, 50vh));
+  transition:
+    opacity 220ms ease,
+    clip-path 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timelapse-invert-wash.is-active {
+  opacity: 0.98;
+  clip-path: circle(var(--timelapse-invert-radius, 0px) at var(--timelapse-invert-x, 50vw) var(--timelapse-invert-y, 50vh));
+}
+
+.timelapse-invert-wash.is-reduced {
+  transition: opacity 180ms ease;
+}
+
+.timelapse-scroll-shell {
+  position: relative;
+  width: 100vw;
+  overflow: clip;
+}
+
+.timelapse-stage {
+  position: relative;
+  height: clamp(4400px, 500vh, 5600px);
+  min-height: 0;
+  padding: 0;
+  display: block;
+  overflow: clip;
+}
+
+.timelapse-stage-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow: clip;
+}
+
+.timelapse-stopwatch.is-scene-locked .timelapse-stage-sticky {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  min-height: 100vh;
+  z-index: 16;
+}
+
+.timelapse-stopwatch.is-scene-locked .timelapse-scroll-shell,
+.timelapse-stopwatch.is-scene-locked .timelapse-stage {
+  overflow: visible;
+}
+
+.timelapse-stage-sticky::before,
+.timelapse-stage-sticky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.timelapse-stage-sticky::before {
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255, 255, 255, calc(0.12 + var(--timelapse-video-opacity) * 0.08)), transparent 18%),
+    linear-gradient(180deg, rgba(247, 242, 234, 0.3), transparent 18%, transparent 76%, rgba(247, 242, 234, 0.34));
+}
+
+.timelapse-stage-sticky::after {
+  background:
+    radial-gradient(circle at 50% 48%, transparent 22%, rgba(5, 8, 12, 0.08) 100%);
+  opacity: var(--timelapse-vignette-opacity);
+}
+
+.timelapse-story {
+  position: absolute;
+  left: clamp(20px, 5vw, 84px);
+  top: clamp(88px, 10vw, 136px);
+  z-index: 8;
+  width: min(34rem, 34vw);
+  display: grid;
+  gap: 14px;
+  opacity: var(--timelapse-story-opacity);
+  transform: translate3d(0, var(--timelapse-story-shift), 0);
+  pointer-events: none;
+}
+
+.timelapse-story .eyebrow,
+.timelapse-story .section-note,
+.timelapse-story h2 {
+  margin: 0;
+  color: var(--timelapse-ink);
+}
+
+.timelapse-story .eyebrow {
+  color: rgba(15, 16, 20, 0.7);
+}
+
+.timelapse-story h2 {
+  max-width: 8.5ch;
+  font-size: clamp(3rem, 4.9vw, 5.6rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+}
+
+.timelapse-story .section-note {
+  max-width: 42ch;
+  color: var(--timelapse-ink-soft);
+}
+
+.timelapse-media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timelapse-media::before,
+.timelapse-media::after,
+.timelapse-media__veil {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.timelapse-media::before {
+  z-index: 6;
+  background:
+    linear-gradient(180deg, rgba(247, 242, 234, 0.9), rgba(247, 242, 234, 0.16) 24%, rgba(247, 242, 234, 0.08) 72%, rgba(247, 242, 234, 0.92)),
+    linear-gradient(90deg, rgba(247, 242, 234, 0.22), transparent 18%, transparent 82%, rgba(247, 242, 234, 0.22));
+}
+
+.timelapse-media::after {
+  z-index: 7;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.08));
+  opacity: calc(0.18 + var(--timelapse-video-opacity) * 0.24);
+}
+
+.timelapse-media__veil {
+  z-index: 5;
+  background:
+    linear-gradient(180deg, rgba(6, 10, 16, 0.04), rgba(6, 10, 16, 0.22));
+  opacity: calc(0.12 + (1 - var(--timelapse-video-opacity)) * 0.24);
+}
+
+.timelapse-panel {
+  position: absolute;
+  top: var(--timelapse-panel-top, 0);
+  right: var(--timelapse-panel-side, 0);
+  bottom: var(--timelapse-panel-bottom, 0);
+  left: var(--timelapse-panel-side, 0);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+  appearance: none;
+  cursor: default;
+  border-radius: var(--timelapse-panel-radius, 0);
+  opacity: var(--timelapse-panel-opacity, 0);
+  transform: translate3d(0, var(--timelapse-panel-shift, 0px), 0) scale(var(--timelapse-panel-scale, 1));
+  transform-origin: center top;
+  box-shadow: 0 24px 80px rgba(8, 12, 18, 0.22);
+  transition:
+    opacity 320ms ease,
+    filter 260ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 320ms ease,
+    inset 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timelapse-panel--city-a,
+.timelapse-panel--city-b,
+.timelapse-panel--city-c,
+.timelapse-stopwatch.is-engaged .timelapse-panel--city-a,
+.timelapse-stopwatch.is-engaged .timelapse-panel--city-b,
+.timelapse-stopwatch.is-engaged .timelapse-panel--city-c {
+  clip-path: none;
+  transform: translate3d(0, var(--timelapse-panel-shift, 0px), 0) scale(var(--timelapse-panel-scale, 1));
+}
+
+.timelapse-panel__poster,
+.timelapse-panel__video,
+.timelapse-panel__freeze,
+.timelapse-panel__shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.timelapse-panel__poster {
+  object-fit: cover;
+  transform: scale(1.02);
+  filter: blur(8px) saturate(1.02) brightness(0.92);
+  opacity: 0.54;
+  transition: opacity 180ms ease, filter 220ms ease;
+}
+
+.timelapse-panel__video,
+.timelapse-panel__freeze {
+  padding: 0;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.timelapse-panel__video {
+  z-index: 2;
+  opacity: 1;
+  transform: translateZ(0);
+  filter: none;
+  transition: opacity 180ms ease;
+  backface-visibility: hidden;
+  contain: paint;
+}
+
+.timelapse-panel--city-a .timelapse-panel__video,
+.timelapse-panel--city-b .timelapse-panel__video,
+.timelapse-panel--city-c .timelapse-panel__video {
+  transform: translateZ(0);
+  filter: none;
+}
+
+.timelapse-stopwatch.is-loaded .timelapse-panel[data-showcase="active"] .timelapse-panel__poster {
+  opacity: 0;
+}
+
+.timelapse-stopwatch[data-timelapse-state="playing"] .timelapse-panel[data-showcase="inactive"] .timelapse-panel__poster {
+  filter: none;
+  opacity: 0.96;
+}
+
+.timelapse-stopwatch[data-timelapse-state="playing"] .timelapse-panel[data-showcase="inactive"] .timelapse-panel__video {
+  opacity: 0;
+}
+
+.timelapse-panel__freeze {
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.timelapse-stopwatch.is-frozen .timelapse-panel__video {
+  opacity: 0;
+}
+
+.timelapse-stopwatch.is-frozen .timelapse-panel__freeze {
+  opacity: 1;
+}
+
+.timelapse-panel__shade {
+  z-index: 4;
+  background:
+    linear-gradient(180deg, rgba(247, 242, 234, 0.18), transparent 18%, transparent 72%, rgba(10, 13, 18, 0.24));
+}
+
+.timelapse-panel__index,
+.timelapse-panel__label {
+  position: absolute;
+  z-index: 8;
+  color: rgba(248, 243, 235, 0.88);
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  opacity: var(--timelapse-label-opacity);
+  transition: opacity 220ms ease;
+}
+
+.timelapse-panel__index {
+  top: 26px;
+  left: 24px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.timelapse-panel__label {
+  left: 24px;
+  bottom: 22px;
+  display: grid;
+  gap: 3px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  text-align: left;
+}
+
+.timelapse-panel__label strong {
+  display: block;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.timelapse-panel__label span {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(248, 243, 235, 0.72);
+}
+
+.timelapse-divider,
+.timelapse-divider--one,
+.timelapse-divider--two {
+  display: none;
+}
+
+.timelapse-chronograph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 12;
+  width: min(92vw, 1280px);
+  aspect-ratio: 1;
+  transform: translate(calc(-50% + var(--timelapse-view-x)), calc(-50% + var(--timelapse-view-y))) scale(var(--timelapse-view-scale));
+  transform-origin: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.timelapse-ring,
+.timelapse-ring__ticks,
+.timelapse-counter,
+.timelapse-hand,
+.timelapse-watchcase,
+.timelapse-buttons,
+.timelapse-hud {
+  position: absolute;
+  inset: 0;
+}
+
+.timelapse-ring,
+.timelapse-ring__ticks,
+.timelapse-counter,
+.timelapse-hand,
+.timelapse-watchcase,
+.timelapse-hud {
+  pointer-events: none;
+}
+
+.timelapse-ring,
+.timelapse-ring__ticks,
+.timelapse-counter,
+.timelapse-hand,
+.timelapse-watchcase,
+.timelapse-hud {
+  transition:
+    opacity 320ms ease,
+    filter 320ms ease;
+}
+
+.timelapse-ring {
+  overflow: visible;
+}
+
+.timelapse-ring__arc {
+  stroke: var(--timelapse-accent);
+  stroke-width: 0.1;
+  stroke-dasharray: 1.001;
+  stroke-dashoffset: var(--timelapse-ring-dash);
+  filter: none;
+}
+
+.timelapse-ring__ticks::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 270deg,
+      rgba(17, 18, 22, 0.26) 0deg 0.26deg,
+      transparent 0.24deg 1.9deg
+    );
+  mask-image: radial-gradient(
+    circle,
+    transparent calc(100% - 23px),
+    rgba(0, 0, 0, 0.98) calc(100% - 23px) calc(100% - 18px),
+    transparent calc(100% - 18px)
+  );
+  opacity: var(--timelapse-ticks-opacity);
+}
+
+.timelapse-ring__ticks::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 270deg,
+      rgba(17, 18, 22, 0.46) 0deg 0.58deg,
+      transparent 0.5deg 15deg
+    );
+  mask-image: radial-gradient(
+    circle,
+    transparent calc(100% - 28px),
+    rgba(0, 0, 0, 0.98) calc(100% - 28px) calc(100% - 16px),
+    transparent calc(100% - 16px)
+  );
+  opacity: calc(var(--timelapse-ticks-opacity) * 0.9);
+}
+
+.timelapse-counter {
+  display: grid;
+  place-items: center;
+  padding: 10% 12% 21%;
+  transform: translateY(var(--timelapse-counter-shift)) scale(var(--timelapse-counter-scale));
+  transform-origin: center;
+}
+
+.timelapse-counter__ghost,
+.timelapse-counter__fill {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-family: "Barlow Condensed", "Noto Sans SC", sans-serif;
+  font-size: clamp(12rem, 25vw, 29rem);
+  font-weight: 700;
+  line-height: 0.84;
+  letter-spacing: -0.085em;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.timelapse-counter__ghost {
+  color: transparent;
+  opacity: var(--timelapse-counter-ghost-opacity);
+  -webkit-text-stroke: 2px var(--timelapse-ghost-stroke);
+}
+
+.timelapse-counter__fill {
+  color: var(--timelapse-ink);
+  opacity: var(--timelapse-counter-fill-opacity);
+}
+
+.timelapse-counter__detail {
+  grid-area: 1 / 1;
+  align-self: end;
+  justify-self: center;
+  margin-top: min(48vh, 640px);
+  color: var(--timelapse-ink-soft);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(0.8rem, 0.78vw, 1rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: var(--timelapse-detail-opacity);
+}
+
+.timelapse-hand {
+  opacity: var(--timelapse-hand-opacity);
+}
+
+.timelapse-hand__shaft {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 59%;
+  height: clamp(8px, 0.56vw, 11px);
+  border-radius: 999px;
+  background: var(--timelapse-accent);
+  transform-origin: 8% 50%;
+  transform: translate(-8%, -50%) rotate(var(--timelapse-hand-angle));
+}
+
+.timelapse-hand__hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(66px, 4.9vw, 92px);
+  height: clamp(66px, 4.9vw, 92px);
+  border-radius: 50%;
+  background: var(--timelapse-accent);
+  transform: translate(-50%, -50%);
+}
+
+.timelapse-watchcase {
+  opacity: var(--timelapse-case-opacity);
+}
+
+.timelapse-watchcase__loop,
+.timelapse-watchcase__crown {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.timelapse-watchcase__loop {
+  display: none;
+}
+
+.timelapse-watchcase__crown {
+  display: none;
+}
+
+.timelapse-buttons {
+  display: none;
+  z-index: 18;
+  opacity: var(--timelapse-button-opacity);
+  pointer-events: none;
+}
+
+.timelapse-button {
+  position: absolute;
+  top: 8.7%;
+  width: 6.4%;
+  height: 17%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  justify-items: center;
+  align-content: stretch;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.timelapse-button--pause {
+  left: 22.4%;
+  transform: rotate(-32deg);
+}
+
+.timelapse-button--reset {
+  right: 22.4%;
+  transform: rotate(32deg);
+}
+
+.timelapse-button:disabled {
+  cursor: default;
+}
+
+.timelapse-button__stem {
+  position: relative;
+  width: 16%;
+  height: 76%;
+  margin-top: 16%;
+  border-radius: 999px;
+  background: var(--timelapse-accent);
+  box-shadow: none;
+}
+
+.timelapse-button__cap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 88%;
+  height: 10%;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: var(--timelapse-accent);
+  box-shadow: none;
+}
+
+.timelapse-button__cap::before {
+  content: none;
+}
+
+.timelapse-button__icon {
+  display: none;
+}
+
+.timelapse-button.is-pressed .timelapse-button__cap {
+  transform: translateX(-50%) translateY(12%);
+  box-shadow: none;
+}
+
+.timelapse-button.is-pressed .timelapse-button__stem {
+  transform: scaleY(0.95);
+  filter: none;
+}
+
+.timelapse-button:disabled .timelapse-button__stem,
+.timelapse-button:disabled .timelapse-button__cap,
+.timelapse-button:disabled .timelapse-button__icon {
+  opacity: 0.46;
+}
+
+.timelapse-hud {
+  display: grid;
+  place-items: end center;
+  padding: 0 0 4.4%;
+  gap: 8px;
+  opacity: var(--timelapse-hud-opacity);
+}
+
+.timelapse-hud__status,
+.timelapse-hud__caption {
+  display: block;
+  text-align: center;
+}
+
+.timelapse-hud__status {
+  color: rgba(15, 16, 20, 0.72);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.timelapse-hud__caption {
+  color: rgba(15, 16, 20, 0.62);
+  font-size: 1rem;
+  line-height: 1.56;
+}
+
+.timelapse-stopwatch.is-freeze-ready .timelapse-panel {
+  cursor: zoom-in;
+  pointer-events: auto;
+}
+
+.timelapse-stopwatch.is-frozen .timelapse-media {
+  z-index: 1;
+  transform: scale(1.008);
+}
+
+.timelapse-stopwatch.is-frozen .timelapse-ring,
+.timelapse-stopwatch.is-frozen .timelapse-ring__ticks,
+.timelapse-stopwatch.is-frozen .timelapse-counter,
+.timelapse-stopwatch.is-frozen .timelapse-hand,
+.timelapse-stopwatch.is-frozen .timelapse-watchcase,
+.timelapse-stopwatch.is-frozen .timelapse-hud {
+  opacity: 0.12;
+  filter: blur(0.6px);
+}
+
+.timelapse-stopwatch.is-holding-final .timelapse-ring,
+.timelapse-stopwatch.is-holding-final .timelapse-ring__ticks,
+.timelapse-stopwatch.is-holding-final .timelapse-counter,
+.timelapse-stopwatch.is-holding-final .timelapse-hand,
+.timelapse-stopwatch.is-holding-final .timelapse-watchcase,
+.timelapse-stopwatch.is-holding-final .timelapse-buttons,
+.timelapse-stopwatch.is-holding-final .timelapse-hud {
+  opacity: 1;
+}
+
+.timelapse-stopwatch.is-freeze-ready .timelapse-panel:hover {
+  filter: brightness(1.03);
+}
+
+.timelapse-freeze {
+  --timelapse-freeze-origin-x: 50%;
+  --timelapse-freeze-origin-y: 50%;
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 3vw, 36px);
+  perspective: 2200px;
+}
+
+.timelapse-freeze[hidden] {
+  display: none;
+}
+
+.timelapse-freeze__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(244, 90, 35, 0.12), transparent 32%),
+    rgba(10, 14, 20, 0.58);
+  backdrop-filter: blur(20px) saturate(1.05);
+}
+
+.timelapse-freeze__sheet {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: min(1220px, calc(100vw - 40px));
+  max-height: calc(100vh - 40px);
+  padding: clamp(16px, 2vw, 24px);
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.54), transparent 36%),
+    radial-gradient(circle at 14% 16%, rgba(244, 90, 35, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(248, 243, 235, 0.94), rgba(238, 231, 221, 0.92));
+  box-shadow:
+    0 32px 110px rgba(0, 0, 0, 0.28);
+  transform-origin: var(--timelapse-freeze-origin-x) var(--timelapse-freeze-origin-y);
+  transform: translate3d(-50%, -50%, 0) scale(0.94);
+  opacity: 0;
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    box-shadow 280ms ease;
+}
+
+.timelapse-freeze.is-open .timelapse-freeze__sheet {
+  transform: translate3d(-50%, -50%, 0) scale(1);
+  opacity: 1;
+}
+
+.timelapse-freeze__viewer-card {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+}
+
+.timelapse-freeze__frame-surface {
+  position: relative;
+  width: 100%;
+  min-height: min(82vh, 860px);
+  padding: clamp(44px, 7vh, 84px) clamp(18px, 3vw, 34px) clamp(20px, 3vh, 28px);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.32), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(245, 239, 229, 0.12));
+  box-shadow:
+    inset 0 -80px 120px rgba(8, 18, 32, 0.05);
+  overflow: hidden;
+}
+
+.timelapse-freeze__photo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(68vh, 720px);
+  overflow: visible;
+}
+
+.timelapse-freeze__photo-wrap::before,
+.timelapse-freeze__photo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 7% 12% 18%;
+  border-radius: 34px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.1)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 24px 80px rgba(8, 14, 20, 0.14);
+  pointer-events: none;
+}
+
+.timelapse-freeze__photo-wrap::before {
+  transform: translate3d(-34px, 22px, -110px) rotate(-7deg) scale(0.96);
+  opacity: 0.8;
+}
+
+.timelapse-freeze__photo-wrap::after {
+  transform: translate3d(32px, 16px, -64px) rotate(5.5deg) scale(0.985);
+  opacity: 0.66;
+}
+
+.timelapse-freeze__figure {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  margin: 0;
+  width: 100%;
+}
+
+.timelapse-freeze__photo-card {
+  --timelapse-freeze-tilt-x: 0deg;
+  --timelapse-freeze-tilt-y: 0deg;
+  --timelapse-freeze-tilt-lift: 0px;
+  --timelapse-freeze-tilt-scale: 1;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(74vw, 1020px);
+  border-radius: 32px;
+  overflow: hidden;
+  isolation: isolate;
+  transform:
+    perspective(2000px)
+    translate3d(0, calc(var(--timelapse-freeze-tilt-lift) * -0.55), var(--timelapse-freeze-tilt-lift))
+    rotateX(var(--timelapse-freeze-tilt-x))
+    rotateY(var(--timelapse-freeze-tilt-y))
+    scale(var(--timelapse-freeze-tilt-scale));
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: zoom-out;
+}
+
+.timelapse-freeze__photo-card::before,
+.timelapse-freeze__photo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.timelapse-freeze__photo-card::before {
+  z-index: 2;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 26%);
+  mix-blend-mode: screen;
+}
+
+.timelapse-freeze__photo-card::after {
+  z-index: 3;
+  box-shadow:
+    inset 0 -22px 36px rgba(0, 0, 0, 0.08);
+}
+
+.timelapse-freeze__photo-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: min(24vw, 280px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.12) 34%, transparent 72%);
+  filter: blur(10px);
+  mix-blend-mode: screen;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.timelapse-freeze__image {
+  display: block;
+  width: auto;
+  max-width: min(74vw, 1020px);
+  max-height: min(68vh, 720px);
+  object-fit: contain;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.36);
+  box-shadow:
+    0 28px 86px rgba(0, 0, 0, 0.28);
+  transform: translateZ(12px);
+}
+
+.timelapse-freeze__caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 920px);
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(8, 14, 20, 0.1);
+  color: rgba(17, 18, 22, 0.64);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.timelapse-freeze__caption strong {
+  color: rgba(17, 18, 22, 0.9);
+}
+
+body.timelapse-focus .daycycle-widget {
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  pointer-events: none;
+}
+
+body.timelapse-scroll-lock {
+  overflow: hidden;
+  padding-right: var(--timelapse-scrollbar-comp, 0px);
+}
+
+html[data-theme="dark"] .timelapse-stopwatch {
+  --timelapse-surface: #09111a;
+  --timelapse-surface-strong: rgba(9, 17, 26, 0.96);
+  --timelapse-ink: rgba(241, 238, 229, 0.96);
+  --timelapse-ink-soft: rgba(232, 238, 244, 0.76);
+  --timelapse-ghost-stroke: rgba(241, 244, 248, 0.12);
+  --timelapse-tick-color: rgba(255, 255, 255, 0.18);
+  --timelapse-accent: #ff6a2b;
+  --timelapse-accent-glow: rgba(255, 106, 43, 0.26);
+  --timelapse-metal-hi: #ebeff4;
+  --timelapse-metal-mid: #a8b1bc;
+  --timelapse-metal-low: #7d8692;
+  --timelapse-metal-shadow: rgba(0, 0, 0, 0.32);
+}
+
+html[data-theme="dark"] .timelapse-stopwatch::before {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(140, 168, 199, 0.14), transparent 22%),
+    radial-gradient(circle at 82% 76%, rgba(244, 90, 35, 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(6, 12, 20, 0.98), rgba(7, 12, 18, 0.94) 48%, rgba(5, 9, 14, 0.98));
+}
+
+html[data-theme="dark"] .timelapse-stopwatch::after {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+  opacity: 0.3;
+}
+
+html[data-theme="dark"] .timelapse-stage-sticky::before {
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255, 255, 255, 0.08), transparent 18%),
+    linear-gradient(180deg, rgba(6, 12, 20, 0.38), transparent 18%, transparent 76%, rgba(6, 12, 20, 0.42));
+}
+
+html[data-theme="dark"] .timelapse-media::before {
+  background:
+    linear-gradient(180deg, rgba(5, 10, 16, 0.88), transparent 20%, transparent 74%, rgba(5, 10, 16, 0.9)),
+    radial-gradient(circle at 50% 36%, rgba(5, 10, 16, 0.14), transparent 26%);
+}
+
+html[data-theme="dark"] .timelapse-media__veil {
+  background:
+    linear-gradient(180deg, rgba(4, 8, 12, 0.34), rgba(4, 8, 12, 0.54));
+}
+
+html[data-theme="dark"] .timelapse-panel__shade {
+  background:
+    linear-gradient(180deg, rgba(6, 10, 16, 0.18), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.34)),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.12));
+}
+
+html[data-theme="dark"] .timelapse-hud__status {
+  color: rgba(232, 238, 244, 0.82);
+}
+
+html[data-theme="dark"] .timelapse-hud__caption,
+html[data-theme="dark"] .timelapse-story .section-note,
+html[data-theme="dark"] .timelapse-counter__detail,
+html[data-theme="dark"] .timelapse-story .eyebrow {
+  color: rgba(226, 233, 240, 0.74);
+}
+
+html[data-theme="dark"] .timelapse-button__icon {
+  color: rgba(24, 29, 34, 0.72);
+}
+
+html[data-theme="dark"] .timelapse-freeze__sheet {
+  background:
+    radial-gradient(circle at top center, rgba(98, 126, 170, 0.2), transparent 36%),
+    radial-gradient(circle at 18% 14%, rgba(244, 90, 35, 0.16), transparent 28%),
+    linear-gradient(180deg, rgba(12, 18, 26, 0.94), rgba(8, 14, 22, 0.96));
+}
+
+html[data-theme="dark"] .timelapse-freeze__frame-surface {
+  background:
+    radial-gradient(circle at top center, rgba(148, 178, 218, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(8, 14, 22, 0.18));
+  box-shadow: inset 0 -96px 140px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] .timelapse-freeze__photo-wrap::before,
+html[data-theme="dark"] .timelapse-freeze__photo-wrap::after {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    linear-gradient(135deg, rgba(148, 178, 218, 0.08), rgba(8, 14, 22, 0.04));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+}
+
+html[data-theme="dark"] .timelapse-freeze__image {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 28px 86px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .timelapse-freeze__caption {
+  background: rgba(14, 20, 28, 0.44);
+  color: rgba(226, 233, 240, 0.72);
+}
+
+html[data-theme="dark"] .timelapse-freeze__caption strong {
+  color: rgba(238, 243, 248, 0.94);
+}
+
+@media (max-width: 1280px) {
+  .timelapse-story {
+    width: min(35rem, 40vw);
+  }
+
+  .timelapse-chronograph {
+    width: min(108vw, 1320px);
+  }
+
+  .timelapse-counter__ghost,
+  .timelapse-counter__fill {
+    font-size: clamp(14rem, 35vw, 34rem);
+  }
+}
+
+@media (max-width: 1024px) {
+  .timelapse-stage {
+    height: clamp(3600px, 430vh, 4600px);
+  }
+
+  .timelapse-story {
+    width: min(40rem, calc(100vw - 48px));
+    top: clamp(84px, 12vw, 120px);
+  }
+
+  .timelapse-story h2 {
+    max-width: 10ch;
+    font-size: clamp(2.5rem, 5.8vw, 4.4rem);
+  }
+
+  .timelapse-chronograph {
+    width: min(122vw, 1360px);
+  }
+
+  .timelapse-button {
+    top: 10.6%;
+  }
+
+  .timelapse-button--pause {
+    left: 20.8%;
+  }
+
+  .timelapse-button--reset {
+    right: 20.8%;
+  }
+}
+
+@media (max-width: 820px) {
+  .timelapse-stage {
+    height: clamp(3000px, 360vh, 3600px);
+  }
+
+  .timelapse-story {
+    left: 18px;
+    right: 18px;
+    width: auto;
+    top: 82px;
+    gap: 10px;
+  }
+
+  .timelapse-story h2 {
+    font-size: clamp(2.28rem, 9vw, 3.5rem);
+  }
+
+  .timelapse-story .section-note {
+    max-width: 56ch;
+    font-size: 0.98rem;
+  }
+
+  .timelapse-chronograph {
+    width: 166vw;
+  }
+
+  .timelapse-panel__video,
+  .timelapse-panel__freeze {
+    padding: 0;
+  }
+
+  .timelapse-panel__index {
+    top: 18px;
+    left: 16px;
+    font-size: 0.68rem;
+  }
+
+  .timelapse-panel__label {
+    left: 16px;
+    bottom: 18px;
+  }
+
+  .timelapse-panel__label strong {
+    font-size: 0.86rem;
+  }
+
+  .timelapse-counter__ghost,
+  .timelapse-counter__fill {
+    font-size: clamp(10rem, 36vw, 22rem);
+  }
+
+  .timelapse-counter__detail {
+    margin-top: min(48vh, 560px);
+  }
+
+  .timelapse-button {
+    width: 14%;
+    height: 20%;
+    top: 8.8%;
+  }
+
+  .timelapse-button--pause {
+    left: 15.4%;
+  }
+
+  .timelapse-button--reset {
+    right: 15.4%;
+  }
+
+  .timelapse-hud {
+    padding-bottom: 11.6%;
+  }
+
+  .timelapse-hud__caption {
+    max-width: min(30rem, 70vw);
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section.timelapse {
+    overflow: visible;
+  }
+
+  .timelapse-stage {
+    height: clamp(2580px, 320vh, 3200px);
+  }
+
+  .timelapse-story {
+    top: 76px;
+  }
+
+  .timelapse-story .section-note {
+    font-size: 0.92rem;
+  }
+
+  .timelapse-chronograph {
+    width: 212vw;
+  }
+
+  .timelapse-counter {
+    padding: 29% 10% 19%;
+  }
+
+  .timelapse-counter__ghost,
+  .timelapse-counter__fill {
+    font-size: clamp(8rem, 42vw, 16rem);
+  }
+
+  .timelapse-counter__detail {
+    margin-top: min(42vh, 420px);
+    font-size: 0.68rem;
+  }
+
+  .timelapse-button {
+    width: 16%;
+    height: 21%;
+    top: 9.2%;
+  }
+
+  .timelapse-button--pause {
+    left: 14.6%;
+  }
+
+  .timelapse-button--reset {
+    right: 14.6%;
+  }
+
+  .timelapse-hud {
+    padding-bottom: 14%;
+    gap: 6px;
+  }
+
+  .timelapse-hud__status {
+    font-size: 0.6rem;
+  }
+
+  .timelapse-hud__caption {
+    max-width: 72vw;
+    font-size: 0.84rem;
+  }
+
+  .timelapse-freeze {
+    padding: 14px;
+  }
+
+  .timelapse-freeze__sheet {
+    width: calc(100vw - 28px);
+    max-height: calc(100vh - 28px);
+    padding: 14px;
+    border-radius: 28px;
+  }
+
+  .timelapse-freeze__frame-surface {
+    min-height: min(74vh, 700px);
+    padding: 56px 12px 20px;
+    border-radius: 24px;
+  }
+
+  .timelapse-freeze__photo-wrap {
+    min-height: min(58vh, 560px);
+  }
+
+  .timelapse-freeze__photo-wrap::before,
+  .timelapse-freeze__photo-wrap::after {
+    inset: 10% 10% 18%;
+    border-radius: 24px;
+  }
+
+  .timelapse-freeze__photo-card {
+    max-width: 100%;
+    border-radius: 22px;
+  }
+
+  .timelapse-freeze__image {
+    max-width: min(100%, 88vw);
+    max-height: min(54vh, 520px);
+    border-radius: 22px;
+  }
+
+  .timelapse-freeze__caption {
+    width: 100%;
+    border-radius: 22px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timelapse-invert-wash,
+  .timelapse-panel,
+  .timelapse-panel__video,
+  .timelapse-panel__freeze,
+  .timelapse-freeze__sheet,
+  .timelapse-freeze__photo-card,
+  .timelapse-freeze__image,
+  .timelapse-freeze__caption {
+    transition: none;
+  }
+}
