@@ -48,11 +48,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
+  scrollbar-gutter: stable;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: clip;
   color: var(--ink);
   font-family: "Noto Sans SC", sans-serif;
   background:
@@ -3401,13 +3404,14 @@ html[data-theme="dark"] .studio-map-stat strong {
 .astro-overlay {
   position: absolute;
   z-index: 3;
-  pointer-events: none;
+  inset: 0;
+  pointer-events: auto;
   opacity: 0;
   transition: opacity 220ms ease;
 }
 
 .astro-overlay.is-active {
-  opacity: 1;
+  opacity: var(--astro-overlay-opacity, 1);
 }
 
 .astro-overlay__svg {
@@ -3416,13 +3420,31 @@ html[data-theme="dark"] .studio-map-stat strong {
   width: 100%;
   height: 100%;
   overflow: visible;
+  pointer-events: none;
+}
+
+.astro-overlay__scene {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.astro-overlay__leader-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .astro-overlay__constellation-line {
-  stroke: rgba(98, 215, 255, 0.88);
-  stroke-width: 0.18;
+  stroke: rgba(102, 214, 255, 0.92);
+  stroke-width: 0.16;
   stroke-linecap: round;
   stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px rgba(102, 214, 255, 0.28));
 }
 
 .astro-overlay__constellation-point {
@@ -3432,15 +3454,55 @@ html[data-theme="dark"] .studio-map-stat strong {
 }
 
 .astro-overlay__nebula-ellipse {
-  fill: rgba(244, 90, 35, 0.08);
+  fill: rgba(244, 90, 35, 0.05);
   stroke: rgba(255, 166, 133, 0.92);
   stroke-width: 0.18;
   stroke-dasharray: 0.9 0.5;
+  filter: drop-shadow(0 0 16px rgba(255, 166, 133, 0.16));
 }
 
-.astro-overlay__star {
+.astro-overlay__nebula-ellipse--galaxy {
+  stroke: rgba(255, 214, 120, 0.96);
+  fill: rgba(255, 214, 120, 0.05);
+}
+
+.astro-overlay__leaders {
+  pointer-events: none;
+}
+
+.astro-overlay__leader {
+  stroke-width: 0.14;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.astro-overlay__leader--star {
+  stroke: rgba(255, 223, 141, 0.72);
+}
+
+.astro-overlay__leader--dso {
+  stroke: rgba(255, 171, 140, 0.74);
+}
+
+.astro-overlay__leader--constellation {
+  stroke: rgba(123, 220, 255, 0.66);
+}
+
+.astro-overlay__hotspot {
   position: absolute;
   transform: translate(-50%, -50%);
+  pointer-events: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.astro-overlay__hotspot:focus-visible,
+.astro-overlay__label:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.24);
 }
 
 .astro-overlay__star-dot {
@@ -3460,78 +3522,80 @@ html[data-theme="dark"] .studio-map-stat strong {
 
 .astro-overlay__label {
   position: absolute;
-  display: inline-flex;
+  display: inline-grid;
   align-items: center;
-  max-width: min(22vw, 220px);
-  padding: 5px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-  font-family: "Space Grotesk", sans-serif;
+  max-width: min(24vw, 248px);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-family: "Oxanium", "Noto Sans SC", sans-serif;
   font-size: clamp(0.64rem, 0.54rem + 0.24vw, 0.8rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.1;
   white-space: nowrap;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
 }
 
 .astro-overlay__label--star {
-  background: rgba(14, 18, 26, 0.54);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(14, 18, 26, 0.62);
   color: rgba(255, 244, 199, 0.96);
 }
 
 .astro-overlay__label--nebula {
-  background: rgba(34, 12, 15, 0.54);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(34, 12, 15, 0.58);
   color: rgba(255, 206, 189, 0.96);
 }
 
+.astro-overlay__label--galaxy {
+  color: rgba(255, 231, 174, 0.98);
+}
+
 .astro-overlay__label--constellation {
-  background: rgba(8, 16, 24, 0.48);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(8, 16, 24, 0.52);
   color: rgba(136, 232, 255, 0.98);
   font-size: clamp(0.72rem, 0.62rem + 0.28vw, 0.92rem);
 }
 
-.astro-overlay > .astro-overlay__label {
-  transform: translate(-50%, -50%);
+.astro-overlay__label:hover,
+.astro-overlay__hotspot:hover .astro-overlay__star-dot {
+  transform: translateY(-1px);
 }
 
-.astro-overlay > .astro-overlay__label.is-right.is-above {
-  transform: translate(10px, calc(-100% - 10px));
+.astro-overlay[data-show-stars="false"] .astro-overlay__hotspot--star,
+.astro-overlay[data-show-stars="false"] .astro-overlay__label--star,
+.astro-overlay[data-show-stars="false"] .astro-overlay__leader--star {
+  display: none;
 }
 
-.astro-overlay > .astro-overlay__label.is-right.is-below {
-  transform: translate(10px, 10px);
+.astro-overlay[data-show-nebulae="false"] .astro-overlay__nebula-ellipse,
+.astro-overlay[data-show-nebulae="false"] .astro-overlay__hotspot--dso,
+.astro-overlay[data-show-nebulae="false"] .astro-overlay__label--nebula,
+.astro-overlay[data-show-nebulae="false"] .astro-overlay__leader--dso {
+  display: none;
 }
 
-.astro-overlay > .astro-overlay__label.is-left.is-above {
-  transform: translate(calc(-100% - 10px), calc(-100% - 10px));
-}
-
-.astro-overlay > .astro-overlay__label.is-left.is-below {
-  transform: translate(calc(-100% - 10px), 10px);
-}
-
-.astro-overlay__star .astro-overlay__label {
-  left: 0;
-  top: 0;
-}
-
-.astro-overlay__star .astro-overlay__label.is-right.is-above {
-  transform: translate(12px, calc(-100% - 10px));
-}
-
-.astro-overlay__star .astro-overlay__label.is-right.is-below {
-  transform: translate(12px, 10px);
-}
-
-.astro-overlay__star .astro-overlay__label.is-left.is-above {
-  transform: translate(calc(-100% - 12px), calc(-100% - 10px));
-}
-
-.astro-overlay__star .astro-overlay__label.is-left.is-below {
-  transform: translate(calc(-100% - 12px), 10px);
+.astro-overlay[data-show-constellations="false"] .astro-overlay__constellation-line,
+.astro-overlay[data-show-constellations="false"] .astro-overlay__constellation-point,
+.astro-overlay[data-show-constellations="false"] .astro-overlay__label--constellation,
+.astro-overlay[data-show-constellations="false"] .astro-overlay__leader--constellation {
+  display: none;
 }
 
 .bird-gallery-meta-strip {
@@ -4633,7 +4697,7 @@ html[data-theme="dark"] .studio-map-stat strong {
   inset: 0;
   z-index: 2;
   perspective: 1800px;
-  pointer-events: none;
+  pointer-events: auto;
   opacity: 0;
 }
 
@@ -4643,7 +4707,11 @@ html[data-theme="dark"] .studio-map-stat strong {
   opacity: 0;
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
-  pointer-events: none;
+  pointer-events: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .immersive-photo-card {
@@ -4676,6 +4744,17 @@ html[data-theme="dark"] .studio-map-stat strong {
     0 8px 24px rgba(6, 10, 16, 0.12);
 }
 
+.immersive-photo-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 8px 24px rgba(6, 10, 16, 0.12);
+}
+
 .immersive-photo-caption {
   display: grid;
   gap: 4px;
@@ -4698,6 +4777,13 @@ html[data-theme="dark"] .studio-map-stat strong {
   letter-spacing: -0.01em;
 }
 
+.immersive-photo-meta {
+  color: rgba(255, 255, 255, 0.64);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
 .immersive-photo--orion {
   top: 15%;
   left: 14%;
@@ -4706,63 +4792,12 @@ html[data-theme="dark"] .studio-map-stat strong {
   aspect-ratio: 4 / 5;
 }
 
-.immersive-photo--portrait {
-  top: 21%;
-  right: 17%;
-  width: min(15vw, 220px);
-  min-width: 166px;
-  aspect-ratio: 3 / 4;
-}
-
-.immersive-photo--sunset {
-  bottom: 15%;
-  left: 22%;
-  width: min(19vw, 296px);
-  min-width: 210px;
-  aspect-ratio: 16 / 10;
-}
-
 .immersive-photo--studio {
-  right: 21%;
-  bottom: 18%;
-  width: min(17vw, 264px);
-  min-width: 188px;
+  right: 14%;
+  bottom: 14%;
+  width: min(21vw, 320px);
+  min-width: 220px;
   aspect-ratio: 4 / 3;
-}
-
-.immersive-photo--orion .immersive-photo-visual {
-  background:
-    radial-gradient(circle at 40% 38%, rgba(255, 201, 164, 0.7), transparent 11%),
-    radial-gradient(circle at 48% 44%, rgba(164, 124, 255, 0.34), transparent 18%),
-    radial-gradient(circle at 56% 52%, rgba(96, 138, 255, 0.5), transparent 24%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(11, 19, 33, 0.34), rgba(7, 11, 18, 0.92));
-}
-
-.immersive-photo--portrait .immersive-photo-visual {
-  background:
-    radial-gradient(circle at 44% 24%, rgba(255, 255, 255, 0.18), transparent 12%),
-    radial-gradient(circle at 50% 56%, rgba(96, 67, 52, 0.62), transparent 22%),
-    linear-gradient(180deg, rgba(240, 221, 196, 0.36) 0%, rgba(198, 155, 117, 0.44) 46%, rgba(42, 37, 39, 0.72) 100%);
-}
-
-.immersive-photo--sunset .immersive-photo-visual {
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255, 233, 180, 0.56), transparent 14%),
-    linear-gradient(180deg, rgba(255, 168, 107, 0.64), rgba(179, 92, 63, 0.48) 54%, rgba(23, 28, 38, 0.86) 100%),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.12), transparent 42%);
-}
-
-.immersive-photo--studio .immersive-photo-visual {
-  background:
-    radial-gradient(circle at 50% 38%, rgba(126, 165, 215, 0.34), transparent 16%),
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 38% 50%, rgba(244, 90, 35, 0.44), transparent 10%),
-    radial-gradient(circle at 62% 42%, rgba(140, 168, 199, 0.42), transparent 10%),
-    radial-gradient(circle at 56% 66%, rgba(214, 156, 71, 0.34), transparent 12%),
-    linear-gradient(180deg, rgba(16, 24, 33, 0.28), rgba(7, 11, 18, 0.82));
-  background-size: auto, 28px 28px, 28px 28px, auto, auto, auto, auto;
 }
 
 .immersive-photo.is-visible {
@@ -5034,6 +5069,639 @@ html[data-theme="dark"] .studio-map-stat strong {
   box-shadow: 0 20px 48px rgba(9, 14, 22, calc(0.12 + var(--immersive-darkness) * 0.18));
 }
 
+.astro-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(126, 165, 215, 0.2), transparent 24%),
+    radial-gradient(circle at 82% 72%, rgba(244, 90, 35, 0.16), transparent 26%),
+    linear-gradient(180deg, rgba(3, 8, 14, 0.94), rgba(2, 4, 8, 0.985));
+  color: rgba(243, 246, 252, 0.94);
+  opacity: 0;
+  transition: opacity 260ms ease;
+  user-select: none;
+}
+
+.astro-viewer.is-open {
+  opacity: 1;
+}
+
+.astro-viewer[hidden] {
+  display: none;
+}
+
+.astro-viewer__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+}
+
+.astro-viewer__shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  height: 100dvh;
+  padding: clamp(16px, 2vw, 24px);
+  gap: 16px;
+  overflow: hidden;
+}
+
+.astro-viewer__topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.astro-viewer__heading {
+  display: grid;
+  gap: 4px;
+}
+
+.astro-viewer__kicker,
+.astro-viewer__panel-tag {
+  color: rgba(176, 195, 226, 0.74);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.astro-viewer__title {
+  font-size: clamp(1.6rem, 2vw, 2.4rem);
+  line-height: 0.95;
+}
+
+.astro-viewer__meta {
+  color: rgba(223, 229, 241, 0.7);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+}
+
+.astro-viewer__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.astro-viewer__nav,
+.astro-viewer__close,
+.astro-toggle {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.03);
+  color: rgba(247, 249, 252, 0.94);
+  font-family: "Barlow Condensed", "Noto Sans SC", sans-serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  transition: transform 180ms ease, box-shadow 220ms ease, background 220ms ease;
+  white-space: nowrap;
+}
+
+.astro-viewer__nav:hover,
+.astro-viewer__close:hover,
+.astro-toggle:hover,
+.astro-toggle.is-active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05)),
+    rgba(255, 255, 255, 0.05);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+.astro-viewer__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.astro-viewer__stage {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(126, 165, 215, 0.16), transparent 34%),
+    radial-gradient(circle at 84% 22%, rgba(244, 90, 35, 0.08), transparent 24%),
+    rgba(6, 10, 16, 0.92);
+  box-shadow: 0 28px 88px rgba(0, 0, 0, 0.32);
+}
+
+.astro-viewer__stage-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(120, 188, 255, 0.08), transparent 20%),
+    radial-gradient(circle at 82% 78%, rgba(255, 145, 102, 0.1), transparent 24%);
+  pointer-events: none;
+}
+
+.astro-viewer__image-shell {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.astro-viewer__image-shell[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.astro-viewer__image-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  transition: transform 160ms ease;
+}
+
+.astro-viewer__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow:
+    0 24px 72px rgba(0, 0, 0, 0.3),
+    0 20px 64px rgba(0, 0, 0, 0.18);
+}
+
+.astro-viewer__annotation-layer {
+  border-radius: 28px;
+}
+
+.astro-viewer__stage-ui {
+  position: absolute;
+  inset: 18px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.astro-card {
+  position: absolute;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.08), transparent 40%),
+    linear-gradient(180deg, rgba(16, 23, 34, 0.88), rgba(7, 11, 18, 0.76));
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  pointer-events: auto;
+}
+
+.astro-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.astro-card__eyebrow {
+  margin: 0;
+  color: rgba(176, 195, 226, 0.78);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.astro-card__meta {
+  color: rgba(236, 242, 248, 0.72);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+}
+
+.astro-viewer__zoom-cluster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.astro-chip {
+  border: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: rgba(244, 247, 251, 0.94);
+  font-family: "Barlow Condensed", "Noto Sans SC", sans-serif;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 220ms ease, background 220ms ease;
+  white-space: nowrap;
+}
+
+.astro-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 34px rgba(0, 0, 0, 0.22);
+}
+
+.astro-chip--icon {
+  width: 42px;
+  height: 42px;
+  font-size: 1rem;
+}
+
+.astro-chip--reset {
+  padding: 0 16px;
+  height: 42px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.astro-chip--slider {
+  display: grid;
+  gap: 4px;
+  padding: 10px 14px;
+  min-width: 180px;
+}
+
+.astro-chip--slider span {
+  color: rgba(176, 195, 226, 0.74);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: "Oxanium", "Noto Sans SC", sans-serif;
+}
+
+.astro-chip--slider input {
+  width: 100%;
+}
+
+.astro-viewer__histogram {
+  left: 0;
+  bottom: 0;
+  width: min(340px, calc(100% - 120px));
+  padding: 14px 16px 16px;
+  max-height: 172px;
+}
+
+.astro-viewer__histogram-canvas {
+  width: 100%;
+  height: 120px;
+  margin-top: 12px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.astro-viewer__minimap {
+  right: 0;
+  bottom: 0;
+  width: min(240px, 32%);
+  padding: 14px 16px 16px;
+  max-height: 164px;
+}
+
+.astro-viewer__minimap-frame {
+  position: relative;
+  margin-top: 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.astro-viewer__minimap-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  opacity: 0.88;
+}
+
+.astro-viewer__minimap-viewport {
+  position: absolute;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.66),
+    inset 0 0 0 1px rgba(125, 224, 255, 0.82);
+  background: rgba(125, 224, 255, 0.14);
+  backdrop-filter: blur(1px);
+}
+
+.astro-viewer__hud {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 14px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.astro-viewer__panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.06), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    rgba(7, 11, 18, 0.74);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.astro-viewer__summary {
+  margin: 0;
+  color: rgba(232, 238, 247, 0.82);
+  line-height: 1.75;
+}
+
+.astro-viewer__facts,
+.astro-viewer__toggle-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.astro-viewer__facts div {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.astro-viewer__facts span,
+.astro-viewer__opacity span {
+  color: rgba(176, 195, 226, 0.74);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.astro-viewer__facts strong {
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.astro-viewer__toggle-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.astro-viewer__opacity {
+  display: grid;
+  gap: 8px;
+}
+
+.astro-viewer__opacity input {
+  width: 100%;
+}
+
+.astro-viewer__interaction-copy {
+  padding: 12px 14px 0;
+  color: rgba(208, 220, 238, 0.74);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.astro-selection {
+  display: grid;
+  gap: 10px;
+}
+
+.astro-selection[data-accent="star"] {
+  --astro-selection-glow: rgba(255, 214, 116, 0.14);
+  --astro-selection-ink: rgba(255, 239, 199, 0.98);
+  --astro-selection-chip: rgba(255, 214, 116, 0.1);
+}
+
+.astro-selection[data-accent="nebula"] {
+  --astro-selection-glow: rgba(255, 149, 121, 0.14);
+  --astro-selection-ink: rgba(255, 216, 201, 0.98);
+  --astro-selection-chip: rgba(255, 149, 121, 0.1);
+}
+
+.astro-selection[data-accent="galaxy"] {
+  --astro-selection-glow: rgba(255, 205, 107, 0.14);
+  --astro-selection-ink: rgba(255, 234, 186, 0.98);
+  --astro-selection-chip: rgba(255, 205, 107, 0.1);
+}
+
+.astro-selection[data-accent="constellation"] {
+  --astro-selection-glow: rgba(102, 214, 255, 0.14);
+  --astro-selection-ink: rgba(198, 243, 255, 0.98);
+  --astro-selection-chip: rgba(102, 214, 255, 0.1);
+}
+
+.astro-selection__eyebrow {
+  margin: 0;
+  color: rgba(176, 195, 226, 0.74);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.astro-selection__title {
+  color: var(--astro-selection-ink, rgba(247, 248, 250, 0.98));
+  font-size: 1.02rem;
+  line-height: 1.34;
+}
+
+.astro-selection__detail {
+  margin: 0;
+  color: rgba(228, 234, 244, 0.82);
+  line-height: 1.7;
+}
+
+.astro-selection__meta {
+  display: grid;
+  gap: 8px;
+}
+
+.astro-selection__meta span {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    var(--astro-selection-chip, rgba(255, 255, 255, 0.02));
+  color: rgba(214, 223, 236, 0.84);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.astro-selection__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--astro-selection-ink, rgba(255, 234, 184, 0.98));
+  font-family: "Barlow Condensed", "Noto Sans SC", sans-serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 180ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.astro-selection__link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 34px rgba(0, 0, 0, 0.22);
+}
+
+.astro-hovercard {
+  --astro-hover-x: 50%;
+  --astro-hover-y: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  display: grid;
+  gap: 8px;
+  width: min(304px, calc(100vw - 28px));
+  padding: 14px 16px 13px;
+  border: 2px solid rgba(17, 23, 36, 0.98);
+  background:
+    linear-gradient(180deg, rgba(11, 15, 24, 0.96), rgba(5, 7, 13, 0.96)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 42%);
+  box-shadow:
+    inset 0 0 0 2px rgba(98, 214, 255, 0.42),
+    inset 0 0 0 4px rgba(8, 12, 18, 0.94),
+    0 0 0 2px rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  transform: translate3d(var(--astro-hover-x), var(--astro-hover-y), 0);
+  clip-path: polygon(
+    0 6px,
+    6px 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 6px),
+    0 calc(100% - 6px)
+  );
+}
+
+.astro-hovercard[hidden] {
+  display: none;
+}
+
+.astro-hovercard[data-accent="gold"] {
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 214, 116, 0.5),
+    inset 0 0 0 4px rgba(8, 12, 18, 0.94),
+    0 0 0 2px rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(0, 0, 0, 0.18);
+}
+
+.astro-hovercard[data-accent="rust"] {
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 149, 121, 0.48),
+    inset 0 0 0 4px rgba(8, 12, 18, 0.94),
+    0 0 0 2px rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(0, 0, 0, 0.18);
+}
+
+.astro-hovercard[data-accent="amber"] {
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 214, 116, 0.48),
+    inset 0 0 0 4px rgba(8, 12, 18, 0.94),
+    0 0 0 2px rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(0, 0, 0, 0.18);
+}
+
+.astro-hovercard__eyebrow,
+.astro-hovercard__title,
+.astro-hovercard__detail,
+.astro-hovercard__meta span,
+.astro-hovercard__link {
+  font-family: "Silkscreen", "Space Grotesk", sans-serif;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.86);
+}
+
+.astro-hovercard__eyebrow {
+  margin: 0;
+  color: rgba(176, 231, 255, 0.94);
+  font-size: 0.62rem;
+  line-height: 1.55;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.astro-hovercard__title {
+  color: rgba(247, 248, 250, 0.98);
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  line-height: 1.46;
+}
+
+.astro-hovercard__detail {
+  margin: 0;
+  color: rgba(220, 226, 236, 0.88);
+  font-size: 0.74rem;
+  line-height: 1.68;
+}
+
+.astro-hovercard__meta {
+  display: grid;
+  gap: 4px;
+}
+
+.astro-hovercard__meta span {
+  display: block;
+  color: rgba(186, 196, 214, 0.88);
+  font-size: 0.64rem;
+  line-height: 1.62;
+}
+
+.astro-hovercard__meta span::before {
+  content: "> ";
+  color: rgba(102, 214, 255, 0.98);
+}
+
+.astro-hovercard__link {
+  color: rgba(255, 229, 165, 0.96);
+  font-size: 0.64rem;
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.body--astro-viewer-open {
+  overflow: hidden;
+}
+
 .site-footer {
   padding: 28px 0 12px;
   text-align: center;
@@ -5294,25 +5962,13 @@ html[data-theme="dark"] .studio-map-stat strong {
   .immersive-photo--orion {
     top: 14%;
     left: 10%;
-    width: min(22vw, 228px);
-  }
-
-  .immersive-photo--portrait {
-    top: 20%;
-    right: 12%;
-    width: min(20vw, 206px);
-  }
-
-  .immersive-photo--sunset {
-    left: 17%;
-    bottom: 12%;
-    width: min(26vw, 262px);
+    width: min(26vw, 248px);
   }
 
   .immersive-photo--studio {
-    right: 15%;
-    bottom: 15%;
-    width: min(23vw, 236px);
+    right: 10%;
+    bottom: 12%;
+    width: min(30vw, 280px);
   }
 
   .immersive-carousel {
@@ -5332,6 +5988,25 @@ html[data-theme="dark"] .studio-map-stat strong {
   .immersive-stage-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .astro-viewer__main {
+    grid-template-columns: 1fr;
+  }
+
+  .astro-viewer__hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+
+  .astro-viewer__histogram {
+    width: min(288px, calc(100% - 170px));
+    max-height: 152px;
+  }
+
+  .astro-viewer__minimap {
+    width: min(184px, 30%);
+    max-height: 138px;
   }
 }
 
@@ -5453,23 +6128,9 @@ html[data-theme="dark"] .studio-map-stat strong {
     min-width: 150px;
   }
 
-  .immersive-photo--portrait {
-    top: 22%;
-    right: 8%;
-    width: min(24vw, 176px);
-    min-width: 138px;
-  }
-
-  .immersive-photo--sunset {
-    left: 10%;
-    bottom: 10%;
-    width: min(32vw, 232px);
-    min-width: 172px;
-  }
-
   .immersive-photo--studio {
-    right: 10%;
-    bottom: 15%;
+    right: 6%;
+    bottom: 12%;
     width: min(28vw, 210px);
     min-width: 156px;
   }
@@ -5492,6 +6153,39 @@ html[data-theme="dark"] .studio-map-stat strong {
 
   .immersive-stage-copy h3 {
     font-size: clamp(2rem, 8vw, 3.6rem);
+  }
+
+  .astro-viewer__topbar,
+  .astro-viewer__actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .astro-viewer__shell {
+    padding: 14px;
+  }
+
+  .astro-viewer__zoom-cluster {
+    flex-wrap: wrap;
+    max-width: calc(100% - 80px);
+  }
+
+  .astro-chip--slider {
+    min-width: 148px;
+  }
+
+  .astro-viewer__histogram {
+    width: min(228px, calc(100% - 96px));
+    max-height: 132px;
+  }
+
+  .astro-viewer__minimap {
+    width: min(148px, 26%);
+    max-height: 118px;
+  }
+
+  .astro-hovercard {
+    width: min(276px, calc(100vw - 30px));
   }
 
 }
@@ -5639,20 +6333,6 @@ html[data-theme="dark"] .studio-map-stat strong {
     min-width: 132px;
   }
 
-  .immersive-photo--portrait {
-    top: 24%;
-    right: 5%;
-    width: min(28vw, 156px);
-    min-width: 118px;
-  }
-
-  .immersive-photo--sunset {
-    left: 8%;
-    bottom: 10%;
-    width: min(38vw, 212px);
-    min-width: 154px;
-  }
-
   .immersive-photo--studio {
     right: 7%;
     bottom: 16%;
@@ -5673,6 +6353,55 @@ html[data-theme="dark"] .studio-map-stat strong {
     width: calc(100% - 22px);
     min-height: 560px;
     padding: 22px 0;
+  }
+
+  .astro-viewer__hud {
+    grid-template-columns: 1fr;
+  }
+
+  .astro-viewer__toggle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .astro-viewer__stage {
+    min-height: 62vh;
+  }
+
+  .astro-viewer__stage-ui {
+    inset: 10px;
+  }
+
+  .astro-viewer__zoom-cluster {
+    gap: 8px;
+    max-width: calc(100% - 20px);
+  }
+
+  .astro-chip--slider {
+    min-width: 132px;
+  }
+
+  .astro-viewer__histogram {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: auto;
+    margin-right: 82px;
+    max-height: 118px;
+  }
+
+  .astro-viewer__minimap {
+    width: 76px;
+    padding: 8px;
+    max-height: 96px;
+  }
+
+  .astro-card__meta,
+  .astro-viewer__minimap .astro-card__eyebrow {
+    display: none;
+  }
+
+  .astro-hovercard {
+    width: min(252px, calc(100vw - 20px));
   }
 
 }

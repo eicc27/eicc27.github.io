@@ -448,7 +448,8 @@
                     <video
                       class="timelapse-panel__video"
                       data-timelapse-video
-                      data-src="videos/web/chongqing-sunset-1080p.mp4"
+                      data-src="videos/web/chongqing-sunset-15s-play.mp4"
+                      data-rewind-src="videos/web/chongqing-sunset-15s-rewind.mp4"
                       poster="videos/web/chongqing-sunset-1080p.jpg"
                       muted
                       playsinline
@@ -552,45 +553,27 @@
                 <canvas class="immersive-preview-canvas" id="immersive-preview-canvas" aria-hidden="true"></canvas>
 
                 <div class="immersive-photo-field" data-immersive-field aria-label="Atlas photo field">
-                  <article class="immersive-photo immersive-photo--orion" data-immersive-photo>
+                  <button class="immersive-photo immersive-photo--orion" type="button" data-immersive-photo data-astro-card="orion-field">
                     <span class="immersive-photo-card">
-                      <span class="immersive-photo-visual"></span>
+                      <img class="immersive-photo-image" data-astro-card-image alt="">
                       <span class="immersive-photo-caption">
-                        <span class="immersive-photo-tag">Orion Nebula</span>
-                        <strong>深空样张</strong>
+                        <span class="immersive-photo-tag" data-astro-card-tag>Deep sky</span>
+                        <strong data-astro-card-title>深空样张</strong>
+                        <span class="immersive-photo-meta" data-astro-card-meta>Open boundless atlas</span>
                       </span>
                     </span>
-                  </article>
+                  </button>
 
-                  <article class="immersive-photo immersive-photo--portrait" data-immersive-photo>
+                  <button class="immersive-photo immersive-photo--studio" type="button" data-immersive-photo data-astro-card="night-haze">
                     <span class="immersive-photo-card">
-                      <span class="immersive-photo-visual"></span>
+                      <img class="immersive-photo-image" data-astro-card-image alt="">
                       <span class="immersive-photo-caption">
-                        <span class="immersive-photo-tag">Portraits</span>
-                        <strong>人物与生活</strong>
+                        <span class="immersive-photo-tag" data-astro-card-tag>Wide field</span>
+                        <strong data-astro-card-title>广角夜空</strong>
+                        <span class="immersive-photo-meta" data-astro-card-meta>Open boundless atlas</span>
                       </span>
                     </span>
-                  </article>
-
-                  <article class="immersive-photo immersive-photo--sunset" data-immersive-photo>
-                    <span class="immersive-photo-card">
-                      <span class="immersive-photo-visual"></span>
-                      <span class="immersive-photo-caption">
-                        <span class="immersive-photo-tag">Sunsets</span>
-                        <strong>时间切片</strong>
-                      </span>
-                    </span>
-                  </article>
-
-                  <article class="immersive-photo immersive-photo--studio" data-immersive-photo>
-                    <span class="immersive-photo-card">
-                      <span class="immersive-photo-visual"></span>
-                      <span class="immersive-photo-caption">
-                        <span class="immersive-photo-tag">Studio</span>
-                        <strong>工作区回声</strong>
-                      </span>
-                    </span>
-                  </article>
+                  </button>
                 </div>
               </div>
             </div>
@@ -717,6 +700,145 @@
       </div>
 
       <div class="photo-gallery__thumbs bird-gallery-thumbs" data-photo-gallery-thumbs></div>
+    </div>
+  </div>
+
+  <div
+    class="astro-viewer"
+    data-astro-viewer
+    aria-hidden="true"
+    hidden
+    role="dialog"
+    aria-modal="true"
+  >
+    <button class="astro-viewer__backdrop" type="button" data-astro-viewer-close aria-label="Close star atlas"></button>
+
+    <div class="astro-viewer__shell">
+      <div class="astro-viewer__topbar">
+        <div class="astro-viewer__heading">
+          <span class="astro-viewer__kicker" data-astro-viewer-kicker>Boundless atlas</span>
+          <strong class="astro-viewer__title" data-astro-viewer-title>Star field</strong>
+          <span class="astro-viewer__meta" data-astro-viewer-meta>Orientation loading…</span>
+        </div>
+
+        <div class="astro-viewer__actions">
+          <button class="astro-viewer__nav" type="button" data-astro-viewer-prev aria-label="Previous star field">Prev</button>
+          <button class="astro-viewer__nav" type="button" data-astro-viewer-next aria-label="Next star field">Next</button>
+          <button class="astro-viewer__close" type="button" data-astro-viewer-close>Close</button>
+        </div>
+      </div>
+
+      <div class="astro-viewer__main">
+        <div class="astro-viewer__stage" data-astro-viewer-stage>
+          <div class="astro-viewer__stage-glow" aria-hidden="true"></div>
+          <div class="astro-viewer__image-shell" data-astro-viewer-viewport>
+            <div class="astro-viewer__image-card" data-astro-viewer-card>
+              <img class="astro-viewer__image" data-astro-viewer-image alt="">
+              <div class="astro-viewer__annotation-layer astro-overlay" data-astro-viewer-overlay aria-hidden="true" hidden></div>
+            </div>
+          </div>
+
+          <div class="astro-viewer__stage-ui">
+            <div class="astro-viewer__zoom-cluster">
+              <button class="astro-chip astro-chip--icon" type="button" data-astro-zoom="out" aria-label="Zoom out">-</button>
+              <label class="astro-chip astro-chip--slider">
+                <span>Zoom</span>
+                <input type="range" min="100" max="400" step="5" value="100" data-astro-zoom-range>
+              </label>
+              <button class="astro-chip astro-chip--icon" type="button" data-astro-zoom="in" aria-label="Zoom in">+</button>
+              <button class="astro-chip astro-chip--reset" type="button" data-astro-zoom="reset">Reset View</button>
+            </div>
+
+            <div class="astro-viewer__histogram astro-card" data-astro-histogram-panel>
+              <div class="astro-card__head">
+                <p class="astro-card__eyebrow">Color histogram</p>
+                <span class="astro-card__meta">RGB</span>
+              </div>
+              <canvas class="astro-viewer__histogram-canvas" width="320" height="120" data-astro-histogram></canvas>
+            </div>
+
+            <div class="astro-viewer__minimap astro-card" data-astro-minimap>
+              <div class="astro-card__head">
+                <p class="astro-card__eyebrow">Global view</p>
+                <span class="astro-card__meta" data-astro-zoom-readout>1.00x</span>
+              </div>
+              <div class="astro-viewer__minimap-frame">
+                <img class="astro-viewer__minimap-image" data-astro-minimap-image alt="">
+                <div class="astro-viewer__minimap-viewport" data-astro-minimap-viewport aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="astro-hovercard" data-astro-hover hidden>
+            <p class="astro-hovercard__eyebrow" data-astro-hover-eyebrow></p>
+            <strong class="astro-hovercard__title" data-astro-hover-title></strong>
+            <p class="astro-hovercard__detail" data-astro-hover-detail></p>
+            <div class="astro-hovercard__meta" data-astro-hover-meta></div>
+            <a class="astro-hovercard__link" data-astro-hover-link target="_blank" rel="noopener noreferrer">Open documentation</a>
+          </div>
+        </div>
+
+        <aside class="astro-viewer__hud">
+          <div class="astro-viewer__panel astro-viewer__panel--summary">
+            <p class="astro-viewer__panel-tag">FITS readout</p>
+            <p class="astro-viewer__summary" data-astro-viewer-summary></p>
+            <div class="astro-viewer__facts">
+              <div>
+                <span>Frame angle</span>
+                <strong data-astro-viewer-angle>--</strong>
+              </div>
+              <div>
+                <span>Center</span>
+                <strong data-astro-viewer-center>--</strong>
+              </div>
+              <div>
+                <span>Captured</span>
+                <strong data-astro-viewer-captured>--</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="astro-viewer__panel astro-viewer__panel--selection">
+            <p class="astro-viewer__panel-tag">Selected object</p>
+            <div class="astro-selection" data-astro-selection>
+              <p class="astro-selection__eyebrow" data-astro-selection-eyebrow>No selection</p>
+              <strong class="astro-selection__title" data-astro-selection-title>Hover or click a label</strong>
+              <p class="astro-selection__detail" data-astro-selection-detail>
+                Hover shows transient tooltip. Click any star, deep-sky object, or constellation to pin its info here.
+              </p>
+              <div class="astro-selection__meta" data-astro-selection-meta></div>
+              <a
+                class="astro-selection__link"
+                data-astro-selection-link
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                hidden
+              >
+                Open official documentation
+              </a>
+            </div>
+          </div>
+
+          <div class="astro-viewer__panel astro-viewer__panel--controls">
+            <p class="astro-viewer__panel-tag">Overlay layers</p>
+            <div class="astro-viewer__toggle-grid">
+              <button class="astro-toggle is-active" type="button" data-astro-toggle="stars" aria-pressed="true">Stars</button>
+              <button class="astro-toggle is-active" type="button" data-astro-toggle="nebulae" aria-pressed="true">Nebulae</button>
+              <button class="astro-toggle is-active" type="button" data-astro-toggle="constellations" aria-pressed="true">Constellations</button>
+            </div>
+
+            <label class="astro-viewer__opacity">
+              <span>Overlay intensity</span>
+              <input type="range" min="20" max="100" step="1" value="100" data-astro-opacity>
+            </label>
+
+            <div class="astro-viewer__interaction-copy">
+              <span>Wheel to zoom · drag to pan · hover labels for parameters · click any object for official documentation.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   </div>
 

@@ -5,8 +5,16 @@ const LIGHTBOX_TRANSITION_MS = 280;
 const DETAIL_UPDATE_INTERVAL_MS = 1000 / 24;
 const PRELOAD_SCROLL_THRESHOLD = 0.14;
 const UI_ARM_SCROLL_THRESHOLD = 0.9;
+const UI_ARM_SNAP_BAND = 0.045;
+const UI_ARM_SNAP_COOLDOWN_MS = 620;
+const PAUSE_INVERT_MIN_VISIBILITY = 0.18;
+const PAUSE_INVERT_FULL_VISIBILITY = 0.96;
+const PAUSE_INVERT_MIN_RADIUS_RATIO = 0.12;
+const PAUSE_EFFECTS_DEFER_MS = 96;
 const VIDEO_SYNC_TOLERANCE = 1 / 30;
 const CLOCK_SYNC_TOLERANCE = 0.08;
+const FORWARD_VIDEO_MODE = "forward";
+const REVERSE_VIDEO_MODE = "reverse";
 const VIDEO_META = {
   title: "重庆",
   subtitle: "mountain dusk",
@@ -67,6 +75,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   const scrollShell = root.querySelector("[data-timelapse-scroll]");
   const stage = root.querySelector("[data-timelapse-stage]");
   const segment = root.querySelector("[data-timelapse-segment]");
+  const posterImage = segment?.querySelector(".timelapse-panel__poster");
   const video = root.querySelector("[data-timelapse-video]");
   const freezePreview = root.querySelector("[data-timelapse-freeze-preview]");
   const secondsNode = root.querySelector("[data-timelapse-seconds]");
@@ -89,6 +98,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     !scrollShell ||
     !stage ||
     !segment ||
+    !posterImage ||
     !video ||
     !freezePreview ||
     !secondsNode ||
@@ -107,6 +117,10 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     return;
   }
 
+  // Keep viewport overlays outside the narrative container. The stopwatch root
+  // uses content-visibility/contain, which breaks viewport-relative fixed layers.
+  document.body.append(invertWash, lightbox);
+
   const styleCache = Object.create(null);
   const captureCanvas = document.createElement("canvas");
   const captureContext = captureCanvas.getContext("2d", { alpha: false, desynchronized: true });
@@ -116,7 +130,11 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   let scrollProgress = 0;
   let sectionVisible = false;
   let videoLoaded = false;
+  let videoLoadedMode = "";
+  let activeVideoMode = FORWARD_VIDEO_MODE;
   let loadPromise = null;
+  let modeSwitchPromise = null;
+  let reverseWarmPromise = null;
   let visibilityPaused = false;
   let displayLoopId = 0;
   let rewindFrameId = 0;
@@ -136,11 +154,15 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   let frozenFrameRequestToken = 0;
   let lightboxActive = false;
   let invertActive = false;
-  let invertRefreshPending = false;
-  let invertRefreshFrameId = 0;
-  let invertGuardFrameId = 0;
   let pendingLightboxPointer = null;
   let lightboxCardRect = null;
+  let sceneLockActive = false;
+  let sceneLockScrollY = null;
+  let invertBaseRadius = 0;
+  let invertStrength = 0;
+  let frozenFramePrimeTimer = 0;
+  let controlSnapCooldownUntil = 0;
+  let lastScrollY = window.scrollY;
 
   root.setAttribute("data-timelapse-quality", "1080p");
   segment.dataset.showcase = "active";
@@ -149,8 +171,30 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     return Boolean(reducedMotionQuery?.matches);
   }
 
-  function getSeekTime(value) {
-    return clamp(value, 0, SAFE_END_TIME);
+  function getVideoSourceForMode(mode = activeVideoMode) {
+    if (mode === REVERSE_VIDEO_MODE) {
+      return video.dataset.rewindSrc || "";
+    }
+
+    return video.dataset.src || "";
+  }
+
+  function toMediaTime(value, mode = activeVideoMode) {
+    const clampedValue = clamp(value, 0, CLIP_DURATION);
+    if (mode === REVERSE_VIDEO_MODE) {
+      return clamp(CLIP_DURATION - clampedValue, 0, SAFE_END_TIME);
+    }
+
+    return clamp(clampedValue, 0, SAFE_END_TIME);
+  }
+
+  function fromMediaTime(value, mode = activeVideoMode) {
+    const clampedValue = clamp(value, 0, SAFE_END_TIME);
+    if (mode === REVERSE_VIDEO_MODE) {
+      return clamp(CLIP_DURATION - clampedValue, 0, CLIP_DURATION);
+    }
+
+    return clampedValue;
   }
 
   function formatCountdown(seconds) {
@@ -222,7 +266,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       video.readyState >= 2 &&
       Number.isFinite(video.currentTime)
     ) {
-      return clamp(video.currentTime, 0, CLIP_DURATION);
+      return fromMediaTime(video.currentTime, activeVideoMode);
     }
 
     return clamp(currentTime, 0, CLIP_DURATION);
@@ -235,11 +279,6 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     }
 
     return getVideoAnchorTime();
-  }
-
-  function updateScrollbarCompensation() {
-    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
-    document.documentElement.style.setProperty("--timelapse-scrollbar-comp", `${scrollbarWidth}px`);
   }
 
   function getStageStickyBounds() {
@@ -256,10 +295,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     const target = clamp(window.scrollY, min, max);
 
     if (Math.abs(target - window.scrollY) > 1) {
-      window.scrollTo({
-        top: target,
-        behavior: "instant",
-      });
+      window.scrollTo(0, target);
     }
   }
 
@@ -270,16 +306,40 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   function syncSceneLock() {
     const shouldLockScene = state === "rewinding";
     const shouldLockScroll = state === "rewinding" || lightboxActive;
+    const isLockingScene = shouldLockScene && !sceneLockActive;
+    const isUnlockingScene = sceneLockActive && !shouldLockScene;
+
+    if (isLockingScene) {
+      stabilizeSceneScroll();
+      sceneLockScrollY = window.scrollY;
+    }
+
     root.classList.toggle("is-scene-locked", shouldLockScene);
     document.body.classList.toggle("timelapse-focus", sectionVisible || lightboxActive);
     setScrollLock(shouldLockScroll);
+    sceneLockActive = shouldLockScene;
 
-    if (!shouldLockScene) {
+    if (shouldLockScene) {
+      if (sceneLockScrollY == null) {
+        sceneLockScrollY = window.scrollY;
+      }
+
+      stabilizeSceneScroll();
+      window.requestAnimationFrame(() => {
+        requestScrollSceneUpdate();
+      });
       return;
     }
 
-    stabilizeSceneScroll();
+    if (!isUnlockingScene || sceneLockScrollY == null) {
+      sceneLockScrollY = null;
+      return;
+    }
+
+    const restoreScrollY = sceneLockScrollY;
+    sceneLockScrollY = null;
     window.requestAnimationFrame(() => {
+      window.scrollTo(0, restoreScrollY);
       requestScrollSceneUpdate();
     });
   }
@@ -471,8 +531,49 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     root.classList.toggle("is-controls-armed", canUseControls());
   }
 
-  function setInvertOrigin() {
-    const rect = ringNode.getBoundingClientRect();
+  function getControlArmScrollY() {
+    const { min, max } = getStageStickyBounds();
+    return mix(min, max, UI_ARM_SCROLL_THRESHOLD);
+  }
+
+  function maybeSnapToControlThreshold(progressValue, rect = stage.getBoundingClientRect()) {
+    if (
+      prefersReducedMotion() ||
+      lightboxActive ||
+      isActivePlaybackState() ||
+      state === "loading"
+    ) {
+      return false;
+    }
+
+    const now = performance.now();
+    if (now < controlSnapCooldownUntil) {
+      return false;
+    }
+
+    if (Math.abs(progressValue - UI_ARM_SCROLL_THRESHOLD) > UI_ARM_SNAP_BAND) {
+      return false;
+    }
+
+    const direction = Math.sign(window.scrollY - lastScrollY);
+    const nextVisible = rect.top < window.innerHeight * 0.92 && rect.bottom > window.innerHeight * 0.08;
+    if (!nextVisible || direction === 0) {
+      return false;
+    }
+
+    const targetScrollY = getControlArmScrollY();
+    if (Math.abs(targetScrollY - window.scrollY) <= 1) {
+      return false;
+    }
+
+    controlSnapCooldownUntil = now + UI_ARM_SNAP_COOLDOWN_MS;
+    window.scrollTo(0, targetScrollY);
+    lastScrollY = targetScrollY;
+    requestScrollSceneUpdate();
+    return true;
+  }
+
+  function setInvertOriginFromRect(rect) {
     if (!rect.width || !rect.height) {
       return;
     }
@@ -484,62 +585,75 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
         Math.max(centerX, window.innerWidth - centerX),
         Math.max(centerY, window.innerHeight - centerY),
       ) + 24;
+    invertBaseRadius = radius;
 
     invertWash.style.setProperty("--timelapse-invert-x", `${centerX.toFixed(2)}px`);
     invertWash.style.setProperty("--timelapse-invert-y", `${centerY.toFixed(2)}px`);
     invertWash.style.setProperty("--timelapse-invert-radius", `${radius.toFixed(2)}px`);
   }
 
+  function setInvertOrigin() {
+    setInvertOriginFromRect(ringNode.getBoundingClientRect());
+  }
+
   function paintInvertState() {
-    invertWash.classList.toggle("is-active", invertActive);
-    invertWash.classList.toggle("is-reduced", invertActive && prefersReducedMotion());
-    invertWash.style.opacity = invertActive ? "0.98" : "0";
-    invertWash.style.clipPath = invertActive
-      ? "circle(var(--timelapse-invert-radius, 0px) at var(--timelapse-invert-x, 50vw) var(--timelapse-invert-y, 50vh))"
+    const strength = invertActive ? clamp01(invertStrength || 1) : 0;
+    const radius = invertBaseRadius * mix(PAUSE_INVERT_MIN_RADIUS_RATIO, 1, easeOutCubic(strength));
+
+    invertWash.classList.toggle("is-active", strength > 0.001);
+    invertWash.classList.toggle("is-reduced", strength > 0.001 && prefersReducedMotion());
+    invertWash.style.opacity = (0.98 * strength).toFixed(3);
+    invertWash.style.clipPath = strength > 0.001
+      ? `circle(${radius.toFixed(2)}px at var(--timelapse-invert-x, 50vw) var(--timelapse-invert-y, 50vh))`
       : "circle(0px at var(--timelapse-invert-x, 50vw) var(--timelapse-invert-y, 50vh))";
     invertWash.style.transition = prefersReducedMotion()
-      ? "opacity 180ms ease"
-      : "opacity 220ms ease, clip-path 760ms cubic-bezier(0.22, 1, 0.36, 1)";
+      ? "opacity 140ms ease"
+      : "opacity 140ms ease, clip-path 320ms cubic-bezier(0.22, 1, 0.36, 1)";
   }
 
-  function stopInvertGuard() {
-    if (!invertGuardFrameId) {
-      return;
-    }
-
-    window.cancelAnimationFrame(invertGuardFrameId);
-    invertGuardFrameId = 0;
+  function getPausedInvertStrength(rect = stage.getBoundingClientRect()) {
+    const overlapTop = clamp01((window.innerHeight - rect.top) / window.innerHeight);
+    const overlapBottom = clamp01(rect.bottom / window.innerHeight);
+    const visibility = Math.min(overlapTop, overlapBottom);
+    return easeOutCubic(rangeProgress(visibility, PAUSE_INVERT_MIN_VISIBILITY, PAUSE_INVERT_FULL_VISIBILITY));
   }
 
-  function refreshPausedInvert() {
-    invertGuardFrameId = 0;
-
+  function refreshPausedInvert(rect = stage.getBoundingClientRect()) {
     if (state !== "paused" || lightboxActive) {
-      return;
-    }
-
-    invertActive = true;
-    setInvertOrigin();
-    paintInvertState();
-    invertGuardFrameId = window.requestAnimationFrame(refreshPausedInvert);
-  }
-
-  function syncInvertGuard() {
-    if (state === "paused" && !lightboxActive) {
-      if (!invertGuardFrameId) {
-        invertGuardFrameId = window.requestAnimationFrame(refreshPausedInvert);
+      if (invertActive || invertStrength !== 0) {
+        invertActive = false;
+        invertStrength = 0;
+        paintInvertState();
       }
       return;
     }
 
-    stopInvertGuard();
+    setInvertOrigin();
+    invertStrength = getPausedInvertStrength(rect);
+    invertActive = invertStrength > 0.001;
+    paintInvertState();
   }
 
-  function activateInvert() {
-    setInvertOrigin();
+  function syncInvertGuard() {
+    const shouldShowInvert = state === "paused" && !lightboxActive;
+
+    if (shouldShowInvert) {
+      refreshPausedInvert();
+      return;
+    }
+
+    if (invertActive || invertStrength !== 0) {
+      invertActive = false;
+      invertStrength = 0;
+      paintInvertState();
+    }
+  }
+
+  function activateInvert(originRect = ringNode.getBoundingClientRect()) {
+    setInvertOriginFromRect(originRect);
     invertActive = true;
+    invertStrength = 1;
     paintInvertState();
-    syncInvertGuard();
   }
 
   function deactivateInvert({ force = false } = {}) {
@@ -548,43 +662,22 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     }
 
     invertActive = false;
+    invertStrength = 0;
     paintInvertState();
-    syncInvertGuard();
   }
 
-  function schedulePausedInvertRefresh() {
-    if (invertRefreshPending) {
-      return;
+  function scheduleFrozenFramePrime(frameTime, expectedState, delay = PAUSE_EFFECTS_DEFER_MS) {
+    if (frozenFramePrimeTimer) {
+      window.clearTimeout(frozenFramePrimeTimer);
     }
 
-    const refreshInvert = () => {
-      if (state !== "paused" || lightboxActive) {
+    frozenFramePrimeTimer = window.setTimeout(() => {
+      frozenFramePrimeTimer = 0;
+      if (state !== expectedState) {
         return;
       }
-
-      if (!invertActive) {
-        activateInvert();
-        return;
-      }
-
-      setInvertOrigin();
-      paintInvertState();
-    };
-
-    invertRefreshPending = true;
-    queueMicrotask(() => {
-      invertRefreshPending = false;
-      refreshInvert();
-    });
-
-    if (invertRefreshFrameId) {
-      return;
-    }
-
-    invertRefreshFrameId = window.requestAnimationFrame(() => {
-      invertRefreshFrameId = 0;
-      refreshInvert();
-    });
+      primeFrozenFrame(frameTime, expectedState);
+    }, delay);
   }
 
   function primeFrozenFrame(frameTime, expectedState) {
@@ -637,6 +730,10 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   }
 
   function clearFrozenFrame() {
+    if (frozenFramePrimeTimer) {
+      window.clearTimeout(frozenFramePrimeTimer);
+      frozenFramePrimeTimer = 0;
+    }
     frozenFrameRequestToken += 1;
     frozenFramePromise = null;
     frozenFramePromiseTime = NaN;
@@ -716,6 +813,21 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     };
   }
 
+  function createPosterFallbackFrame(frameTime = currentTime) {
+    const posterSrc = video.poster || posterImage.currentSrc || posterImage.src;
+    if (!posterSrc) {
+      return null;
+    }
+
+    return {
+      src: posterSrc,
+      time: frameTime,
+      title: VIDEO_META.title,
+      alt: VIDEO_META.alt,
+      revoke: () => {},
+    };
+  }
+
   async function ensureFrozenFrame(frameTime = currentTime, { expectedState = state } = {}) {
     if (frozenFrame && Math.abs(frozenFrame.time - frameTime) <= VIDEO_SYNC_TOLERANCE) {
       return frozenFrame;
@@ -733,7 +845,27 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     frozenFrameRequestToken = requestToken;
     frozenFramePromiseTime = frameTime;
 
-    const pendingFrame = captureFrameBlob(frameTime)
+    const pendingFrame = (async () => {
+      let nextFrame = captureFrameDataUrl(frameTime);
+
+      if (!nextFrame && videoLoaded) {
+        try {
+          await seekVideo(frameTime);
+        } catch {
+          syncVideo(frameTime, true);
+        }
+        nextFrame = captureFrameDataUrl(frameTime);
+        if (!nextFrame) {
+          nextFrame = await captureFrameBlob(frameTime);
+        }
+      }
+
+      if (!nextFrame) {
+        nextFrame = createPosterFallbackFrame(frameTime);
+      }
+
+      return nextFrame;
+    })()
       .then((nextFrame) => {
         if (!nextFrame) {
           return null;
@@ -896,6 +1028,10 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     }
 
     if (!frame?.src) {
+      frame = createPosterFallbackFrame(frameTime);
+    }
+
+    if (!frame?.src) {
       return;
     }
 
@@ -953,7 +1089,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return;
     }
 
-    const seekTime = getSeekTime(targetTime);
+    const seekTime = toMediaTime(targetTime, activeVideoMode);
     if (force || !Number.isFinite(video.currentTime) || Math.abs(video.currentTime - seekTime) > VIDEO_SYNC_TOLERANCE) {
       try {
         video.currentTime = seekTime;
@@ -968,7 +1104,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return;
     }
 
-    const seekTime = getSeekTime(targetTime);
+    const seekTime = toMediaTime(targetTime, activeVideoMode);
     if (
       Number.isFinite(video.currentTime) &&
       Math.abs(video.currentTime - seekTime) <= VIDEO_SYNC_TOLERANCE &&
@@ -1034,7 +1170,6 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     }
 
     const requestToken = ++playRequestToken;
-    video.playbackRate = 1;
 
     try {
       await video.play();
@@ -1145,13 +1280,13 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     clearFrozenFrame();
 
     if (withInvert) {
-      activateInvert();
+      activateInvert(ringNode.getBoundingClientRect());
     } else {
       deactivateInvert({ force: true });
     }
 
     if (nextState === "paused" || nextState === "ended") {
-      primeFrozenFrame(frozenTime, nextState);
+      scheduleFrozenFramePrime(frozenTime, nextState);
     }
 
     applyScrollScene(scrollProgress);
@@ -1165,13 +1300,18 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     freezePlayback("ended", Math.max(getPlaybackAnchorTime(), SAFE_END_TIME));
   }
 
-  async function loadVideo() {
-    if (video.dataset.loaded === "true" && video.readyState >= 2) {
+  async function loadVideoForMode(mode = activeVideoMode) {
+    const source = getVideoSourceForMode(mode);
+    if (!source) {
+      throw new Error(`Missing timelapse source for mode "${mode}"`);
+    }
+
+    if (videoLoaded && videoLoadedMode === mode && video.readyState >= 2) {
       return;
     }
 
-    if (!video.src) {
-      video.src = video.dataset.src || "";
+    if (!video.currentSrc || video.currentSrc !== new URL(source, window.location.href).href) {
+      video.src = source;
     }
 
     video.loop = false;
@@ -1182,13 +1322,12 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
 
     await new Promise((resolve, reject) => {
       const handleReady = () => {
-        video.dataset.loaded = "true";
         cleanup();
         resolve();
       };
       const handleError = () => {
         cleanup();
-        reject(new Error(`Failed to load ${video.currentSrc || video.dataset.src || "timelapse video"}`));
+        reject(new Error(`Failed to load ${video.currentSrc || source || "timelapse video"}`));
       };
       const cleanup = () => {
         video.removeEventListener("loadeddata", handleReady);
@@ -1203,32 +1342,58 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     });
   }
 
-  async function ensureVideoLoaded() {
-    if (videoLoaded) {
+  async function ensureVideoMode(mode = FORWARD_VIDEO_MODE) {
+    if (videoLoaded && videoLoadedMode === mode) {
       return;
     }
 
-    if (loadPromise) {
-      return loadPromise;
+    if (modeSwitchPromise) {
+      return modeSwitchPromise;
     }
 
-    setState("loading");
+    const shouldAnnounceLoading = !videoLoaded;
+    if (shouldAnnounceLoading) {
+      setState("loading");
+    }
 
-    loadPromise = loadVideo()
+    modeSwitchPromise = loadVideoForMode(mode)
       .then(() => {
         videoLoaded = true;
+        videoLoadedMode = mode;
+        activeVideoMode = mode;
         root.classList.add("is-loaded");
-        syncVideo(0, true);
-        paintProgress(0, { forceText: true });
-        setState("ready");
+        if (shouldAnnounceLoading) {
+          syncVideo(0, true);
+          paintProgress(0, { forceText: true });
+          setState("ready");
+        }
       })
       .catch((error) => {
         console.error("Failed to load timelapse assets:", error);
-        loadPromise = null;
-        setState("ready");
+        if (shouldAnnounceLoading) {
+          setState("ready");
+        }
+        throw error;
+      })
+      .finally(() => {
+        modeSwitchPromise = null;
       });
 
-    return loadPromise;
+    return modeSwitchPromise;
+  }
+
+  async function ensureVideoLoaded() {
+    return ensureVideoMode(activeVideoMode);
+  }
+
+  function warmReverseVideo() {
+    if (reverseWarmPromise || !video.dataset.rewindSrc) {
+      return;
+    }
+
+    reverseWarmPromise = fetch(video.dataset.rewindSrc, { priority: "low" }).catch(() => {
+      // Keep rewind resilient even if the background warmup misses.
+    });
   }
 
   async function resumeVisiblePlayback() {
@@ -1236,7 +1401,9 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return;
     }
 
+    await ensureVideoMode(FORWARD_VIDEO_MODE);
     visibilityPaused = false;
+    video.playbackRate = 1;
     const resumeTime = getVideoAnchorTime();
     resetRenderedCountdown(resumeTime);
     try {
@@ -1261,11 +1428,17 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return;
     }
 
-    await ensureVideoLoaded();
+    try {
+      await ensureVideoMode(FORWARD_VIDEO_MODE);
+    } catch {
+      return;
+    }
 
     if (!videoLoaded || state === "loading" || state === "rewinding") {
       return;
     }
+
+    warmReverseVideo();
 
     closeLightbox({ immediate: true });
     deactivateInvert({ force: true });
@@ -1277,6 +1450,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     const shouldPauseForVisibility = document.visibilityState !== "visible";
 
     visibilityPaused = shouldPauseForVisibility;
+    video.playbackRate = 1;
     resetRenderedCountdown(nextStartTime);
     try {
       await seekVideo(nextStartTime);
@@ -1319,12 +1493,37 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     setState("paused");
     closeLightbox({ immediate: true });
     clearFrozenFrame();
-    activateInvert();
-    primeFrozenFrame(pausedTime, "paused");
     applyScrollScene(scrollProgress);
+    window.requestAnimationFrame(() => {
+      if (state !== "paused") {
+        return;
+      }
+      refreshPausedInvert();
+    });
+    scheduleFrozenFramePrime(pausedTime, "paused");
   }
 
-  function startRewind() {
+  async function finishRewind() {
+    if (state !== "rewinding") {
+      return;
+    }
+
+    stopRewindLoop();
+    pauseVideoElement();
+
+    try {
+      await ensureVideoMode(FORWARD_VIDEO_MODE);
+    } catch {
+      // If the forward asset cannot be restored immediately, keep UI consistent.
+    }
+
+    syncVideo(0, true);
+    stopPlaybackClock(0);
+    paintProgress(0, { forceText: true });
+    setState("ready");
+  }
+
+  async function startRewind() {
     if (state === "loading" || state === "rewinding" || currentTime <= 0.01) {
       return;
     }
@@ -1336,34 +1535,50 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     pauseVideoElement();
     stopDisplayLoop();
     stopRewindLoop();
+
+    const rewindStartTime = getVideoAnchorTime();
+
+    try {
+      await ensureVideoMode(REVERSE_VIDEO_MODE);
+    } catch {
+      return;
+    }
+
+    if (!videoLoaded || state === "loading") {
+      return;
+    }
+
+    stopPlaybackClock(rewindStartTime);
+    try {
+      await seekVideo(rewindStartTime);
+    } catch {
+      syncVideo(rewindStartTime, true);
+    }
+    paintProgress(rewindStartTime, { forceText: true });
     setState("rewinding");
 
-    let rewindTime = getVideoAnchorTime();
-    stopPlaybackClock(rewindTime);
-    let lastTimestamp = 0;
+    video.playbackRate = REWIND_SPEED;
+    const started = await playVideoFromCurrentTime();
+    if (!started || state !== "rewinding") {
+      await finishRewind();
+      return;
+    }
 
-    const step = (timestamp) => {
-      if (!lastTimestamp) {
-        lastTimestamp = timestamp;
-      }
-
-      const deltaSeconds = (timestamp - lastTimestamp) / 1000;
-      lastTimestamp = timestamp;
-      rewindTime = Math.max(0, rewindTime - deltaSeconds * REWIND_SPEED);
-
-      syncVideo(rewindTime, true);
-      paintProgress(rewindTime, { forceText: true });
-
-      if (rewindTime > 0.001) {
-        rewindFrameId = window.requestAnimationFrame(step);
+    const step = () => {
+      if (state !== "rewinding") {
+        rewindFrameId = 0;
         return;
       }
 
-      rewindFrameId = 0;
-      syncVideo(0, true);
-      paintProgress(0, { forceText: true });
-      setState("ready");
-      requestScrollSceneUpdate();
+      const rewindTime = getVideoAnchorTime();
+      paintProgress(rewindTime, { forceText: true });
+
+      if (rewindTime <= 0.001 || video.ended || video.currentTime >= SAFE_END_TIME - VIDEO_SYNC_TOLERANCE) {
+        void finishRewind();
+        return;
+      }
+
+      rewindFrameId = window.requestAnimationFrame(step);
     };
 
     rewindFrameId = window.requestAnimationFrame(step);
@@ -1384,23 +1599,28 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     const rect = stage.getBoundingClientRect();
     const travel = Math.max(stage.offsetHeight - window.innerHeight, 1);
     const computedProgress = prefersReducedMotion() ? 0.9 : clamp01(-rect.top / travel);
+
+    if (maybeSnapToControlThreshold(computedProgress, rect)) {
+      return;
+    }
+
     const nextProgress = shouldFreezeSceneProgress() || lightboxActive ? scrollProgress : computedProgress;
     const nextVisible = rect.top < window.innerHeight * 0.92 && rect.bottom > window.innerHeight * 0.08;
 
     applyScrollScene(nextProgress);
 
-    if (state === "paused" && !lightboxActive) {
-      schedulePausedInvertRefresh();
-    }
-
     if (state === "rewinding") {
       setInvertOrigin();
+    }
+
+    if (state === "paused" && !lightboxActive) {
+      refreshPausedInvert(rect);
     }
 
     void syncSectionVisibility(nextVisible);
 
     if (nextVisible && nextProgress >= PRELOAD_SCROLL_THRESHOLD) {
-      void ensureVideoLoaded();
+      void ensureVideoLoaded().catch(() => {});
     }
   }
 
@@ -1416,13 +1636,13 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     if (state === "paused" && !lightboxActive) {
       const rect = stage.getBoundingClientRect();
       const nextVisible = rect.top < window.innerHeight * 0.92 && rect.bottom > window.innerHeight * 0.08;
-
-      setInvertOrigin();
-      paintInvertState();
+      refreshPausedInvert(rect);
       void syncSectionVisibility(nextVisible);
+      lastScrollY = window.scrollY;
       return;
     }
 
+    lastScrollY = window.scrollY;
     requestScrollSceneUpdate();
   }
 
@@ -1574,11 +1794,10 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
 
   window.addEventListener("scroll", handleWindowScroll, { passive: true });
   window.addEventListener("resize", () => {
-    updateScrollbarCompensation();
     if (lightboxActive) {
       resetLightboxTilt();
     }
-    if (state === "paused" && invertActive) {
+    if (invertActive && state !== "paused") {
       setInvertOrigin();
       paintInvertState();
     }
@@ -1601,7 +1820,6 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     });
   }
 
-  updateScrollbarCompensation();
   paintInvertState();
   paintProgress(0, { forceText: true });
   applyScrollScene(prefersReducedMotion() ? 0.82 : 0);

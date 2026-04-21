@@ -1,9 +1,10 @@
+import { initAstroImmersive } from "./astro-immersive.js";
 import { initBirdsGallery } from "./birds-gallery.js";
 import { initDayCycleTheme } from "./daycycle.js";
 import { createImmersivePreviewScene } from "./immersive-preview-scene.js";
 import { initPhotoDecks } from "./photo-decks.js";
 import { createStudioScene } from "./studio-scene.js";
-import { initTimelapseStopwatch } from "./timelapse-stopwatch.js?v=20260419k";
+import { initTimelapseStopwatch } from "./timelapse-stopwatch.js?v=20260420i";
 
 document.documentElement.classList.add("js-enabled");
 
@@ -82,9 +83,7 @@ let currentImmersivePointer = {
 };
 const IMMERSIVE_PHOTO_MOTION = [
   { appearStart: 0.42, appearSpan: 0.14, entryX: -36, entryY: 22, pointerX: -20, pointerY: -14, rotate: -7, depth: 22, scale: 0.92 },
-  { appearStart: 0.47, appearSpan: 0.14, entryX: 32, entryY: 20, pointerX: 18, pointerY: -12, rotate: 6, depth: 18, scale: 0.9 },
-  { appearStart: 0.52, appearSpan: 0.14, entryX: -30, entryY: 26, pointerX: -16, pointerY: 16, rotate: -5, depth: 14, scale: 0.94 },
-  { appearStart: 0.57, appearSpan: 0.14, entryX: 34, entryY: 24, pointerX: 20, pointerY: 14, rotate: 5, depth: 20, scale: 0.91 },
+  { appearStart: 0.49, appearSpan: 0.14, entryX: 34, entryY: 18, pointerX: 18, pointerY: 12, rotate: 5, depth: 20, scale: 0.94 },
 ];
 
 if (yearNode) {
@@ -803,5 +802,6 @@ document.addEventListener("visibilitychange", () => {
 });
 
 initPhotoDecks({ reducedMotionQuery });
+initAstroImmersive();
 initBirdsGallery({ reducedMotionQuery });
 initTimelapseStopwatch({ reducedMotionQuery });

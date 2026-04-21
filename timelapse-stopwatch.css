@@ -956,7 +956,6 @@ body.timelapse-focus .daycycle-widget {
 
 body.timelapse-scroll-lock {
   overflow: hidden;
-  padding-right: var(--timelapse-scrollbar-comp, 0px);
 }
 
 html[data-theme="dark"] .timelapse-stopwatch {

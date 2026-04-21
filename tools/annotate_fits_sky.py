@@ -336,11 +336,21 @@ def stretch_preview(preview: np.ndarray, header: fits.Header) -> np.ndarray:
     return np.rint(stretched * 255.0).astype(np.uint8)
 
 
-def world_to_preview_xy(x: float, y: float, width: int, height: int, preview_width: int, preview_height: int) -> tuple[float, float]:
+def world_to_preview_xy(
+    x: float,
+    y: float,
+    width: int,
+    height: int,
+    preview_width: int,
+    preview_height: int,
+    flip_vertical: bool = False,
+) -> tuple[float, float]:
     if width <= 1 or height <= 1:
         return float(x), float(y)
     preview_x = x * (preview_width - 1) / (width - 1)
     preview_y = y * (preview_height - 1) / (height - 1)
+    if flip_vertical:
+        preview_y = float(preview_height - 1) - preview_y
     return preview_x, preview_y
 
 
@@ -351,6 +361,7 @@ def get_visible_stars(
     preview_width: int,
     preview_height: int,
     max_stars: int | None = None,
+    flip_vertical: bool = False,
 ) -> list[dict[str, object]]:
     visible: list[dict[str, object]] = []
 
@@ -362,7 +373,15 @@ def get_visible_stars(
             continue
         if x < 0 or x >= width or y < 0 or y >= height:
             continue
-        preview_x, preview_y = world_to_preview_xy(x, y, width, height, preview_width, preview_height)
+        preview_x, preview_y = world_to_preview_xy(
+            x,
+            y,
+            width,
+            height,
+            preview_width,
+            preview_height,
+            flip_vertical=flip_vertical,
+        )
         visible.append(
             {
                 **star,
@@ -582,7 +601,7 @@ def process_file(
         _ = layout
         wcs = WCS(header, naxis=2)
         preview_linear = downsample_preview(data, header, preview_edge, chunk_rows)
-        preview_rgb = stretch_preview(preview_linear, header)
+        preview_rgb = np.flipud(stretch_preview(preview_linear, header))
         preview_image = Image.fromarray(preview_rgb, mode="RGB")
         all_visible_stars = get_visible_stars(
             wcs,
@@ -591,6 +610,7 @@ def process_file(
             preview_image.width,
             preview_image.height,
             max_stars=None,
+            flip_vertical=True,
         )
         labeled_stars = all_visible_stars[: max(0, max_stars)]
         constellations = build_constellation_groups(all_visible_stars, max_constellations=max_constellations)
