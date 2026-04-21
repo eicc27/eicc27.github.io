@@ -33,39 +33,6 @@ function clampIndex(index, size) {
   return ((index % size) + size) % size;
 }
 
-function formatAngle(metadata) {
-  if (!metadata || typeof metadata.orientationDeg !== "number") {
-    return "--";
-  }
-  return `${metadata.orientationDeg.toFixed(1)}° ${metadata.orientationReference || ""}`.trim();
-}
-
-function formatCenter(metadata) {
-  if (!metadata) {
-    return "--";
-  }
-  const ra = typeof metadata.centerRaDeg === "number" ? metadata.centerRaDeg.toFixed(3) : "--";
-  const dec = typeof metadata.centerDecDeg === "number" ? metadata.centerDecDeg.toFixed(3) : "--";
-  return `RA ${ra}° / Dec ${dec}°`;
-}
-
-function formatCapturedAt(value) {
-  if (!value) {
-    return "--";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
 function renderHistogram(canvas, histogram) {
   if (!(canvas instanceof HTMLCanvasElement) || !histogram) {
     return;
@@ -85,18 +52,6 @@ function renderHistogram(canvas, histogram) {
   ];
 
   context.clearRect(0, 0, width, height);
-  context.fillStyle = "rgba(6, 10, 18, 0.86)";
-  context.fillRect(0, 0, width, height);
-
-  context.strokeStyle = "rgba(255, 255, 255, 0.06)";
-  context.lineWidth = 1;
-  for (let index = 1; index < 4; index += 1) {
-    const y = (height / 4) * index;
-    context.beginPath();
-    context.moveTo(0, y);
-    context.lineTo(width, y);
-    context.stroke();
-  }
 
   channels.forEach(({ key, stroke, fill }) => {
     const values = histogram[key] || [];
@@ -107,15 +62,15 @@ function renderHistogram(canvas, histogram) {
     context.beginPath();
     values.forEach((value, index) => {
       const x = (index / Math.max(values.length - 1, 1)) * width;
-      const y = height - (Number(value) / maxCount) * (height - 6) - 3;
+      const y = height - (Number(value) / maxCount) * (height - 4) - 2;
       if (index === 0) {
         context.moveTo(x, y);
       } else {
         context.lineTo(x, y);
       }
     });
-    context.lineTo(width, height - 2);
-    context.lineTo(0, height - 2);
+    context.lineTo(width, height - 1);
+    context.lineTo(0, height - 1);
     context.closePath();
     context.fillStyle = fill;
     context.fill();
@@ -123,7 +78,7 @@ function renderHistogram(canvas, histogram) {
     context.beginPath();
     values.forEach((value, index) => {
       const x = (index / Math.max(values.length - 1, 1)) * width;
-      const y = height - (Number(value) / maxCount) * (height - 6) - 3;
+      const y = height - (Number(value) / maxCount) * (height - 4) - 2;
       if (index === 0) {
         context.moveTo(x, y);
       } else {
@@ -131,75 +86,9 @@ function renderHistogram(canvas, histogram) {
       }
     });
     context.strokeStyle = stroke;
-    context.lineWidth = 2;
+    context.lineWidth = 1.5;
     context.stroke();
   });
-}
-
-function buildSelectionPayload(item) {
-  if (!item) {
-    return null;
-  }
-
-  if (item.category === "star" || item.kind === "star") {
-    return {
-      eyebrow: "IAU named star",
-      title: item.name,
-      detail: `Magnitude ${item.vmag?.toFixed?.(2) ?? "--"} · ${item.constellation || "Unknown constellation"}`,
-      meta: [
-        `RA ${item.raDeg ?? "--"}°`,
-        `Dec ${item.decDeg ?? "--"}°`,
-        item.docSource || "CDS SIMBAD",
-      ],
-      docUrl: item.docUrl,
-      accent: "star",
-    };
-  }
-
-  if (item.category === "constellation" || item.kind === "constellation") {
-    return {
-      eyebrow: item.partial ? "Constellation fragment" : "Constellation guide",
-      title: item.name,
-      detail: item.partial ? "Partial figure visible in this frame." : "Visible constellation skeleton in this frame.",
-      meta: [
-        `${item.points?.length ?? 0} visible guide stars`,
-        `${item.lines?.length ?? 0} visible segments`,
-        item.docSource || "IAU",
-      ],
-      docUrl: item.docUrl,
-      accent: "constellation",
-    };
-  }
-
-  return {
-    eyebrow: `${String(item.category || "deep-sky").replaceAll("-", " ")} / ${item.kind || "object"}`,
-    title: item.displayLabel || item.catalogName || item.name,
-    detail: `${item.constellation || "Unknown"} · ${item.displayCommonName || item.name}`,
-    meta: [
-      item.mag != null ? `Mag ${Number(item.mag).toFixed(1)}` : "Mag --",
-      item.sizeArcmin ? `Size ${Number(item.sizeArcmin).toFixed(1)}′` : "Size --",
-      `RA ${item.raDeg ?? "--"}° / Dec ${item.decDeg ?? "--"}°`,
-      item.docSource || "CDS SIMBAD",
-    ],
-    docUrl: item.docUrl,
-    accent: item.category === "galaxy" ? "galaxy" : "nebula",
-  };
-}
-
-function normalizeSelectionAccent(accent) {
-  if (accent === "gold") {
-    return "star";
-  }
-  if (accent === "amber") {
-    return "galaxy";
-  }
-  if (accent === "cyan") {
-    return "constellation";
-  }
-  if (accent === "rust") {
-    return "nebula";
-  }
-  return accent || "nebula";
 }
 
 export function initAstroImmersive() {
@@ -213,22 +102,11 @@ export function initAstroImmersive() {
   const viewerTitle = document.querySelector("[data-astro-viewer-title]");
   const viewerKicker = document.querySelector("[data-astro-viewer-kicker]");
   const viewerMeta = document.querySelector("[data-astro-viewer-meta]");
-  const viewerSummary = document.querySelector("[data-astro-viewer-summary]");
-  const viewerAngle = document.querySelector("[data-astro-viewer-angle]");
-  const viewerCenter = document.querySelector("[data-astro-viewer-center]");
-  const viewerCaptured = document.querySelector("[data-astro-viewer-captured]");
-  const selectionEyebrow = document.querySelector("[data-astro-selection-eyebrow]");
-  const selectionTitle = document.querySelector("[data-astro-selection-title]");
-  const selectionDetail = document.querySelector("[data-astro-selection-detail]");
-  const selectionMeta = document.querySelector("[data-astro-selection-meta]");
-  const selectionLink = document.querySelector("[data-astro-selection-link]");
   const closeButtons = Array.from(document.querySelectorAll("[data-astro-viewer-close]"));
   const prevButton = document.querySelector("[data-astro-viewer-prev]");
   const nextButton = document.querySelector("[data-astro-viewer-next]");
   const toggleButtons = Array.from(document.querySelectorAll("[data-astro-toggle]"));
-  const opacityInput = document.querySelector("[data-astro-opacity]");
   const zoomButtons = Array.from(document.querySelectorAll("[data-astro-zoom]"));
-  const zoomRange = document.querySelector("[data-astro-zoom-range]");
   const zoomReadout = document.querySelector("[data-astro-zoom-readout]");
   const minimapImage = document.querySelector("[data-astro-minimap-image]");
   const minimapViewport = document.querySelector("[data-astro-minimap-viewport]");
@@ -238,7 +116,8 @@ export function initAstroImmersive() {
   const hoverTitle = document.querySelector("[data-astro-hover-title]");
   const hoverDetail = document.querySelector("[data-astro-hover-detail]");
   const hoverMeta = document.querySelector("[data-astro-hover-meta]");
-  const hoverLink = document.querySelector("[data-astro-hover-link]");
+  const dwellBar = document.querySelector("[data-astro-dwell-bar]");
+  const dwellCta = document.querySelector("[data-astro-dwell-cta]");
 
   if (
     !cards.length ||
@@ -270,7 +149,6 @@ export function initAstroImmersive() {
   let currentIndex = 0;
   let isOpen = false;
   let activeItem = null;
-  let selectedPayload = null;
   let filters = {
     stars: true,
     nebulae: true,
@@ -283,6 +161,8 @@ export function initAstroImmersive() {
   };
   let dragState = null;
   let transformFrame = 0;
+  let dwellAnimFrame = null;
+  let activeDwellPayload = null;
 
   function syncToggleButtons() {
     toggleButtons.forEach((button) => {
@@ -298,45 +178,42 @@ export function initAstroImmersive() {
       return;
     }
     hoverCard.hidden = true;
+    hoverCard.classList.remove("astro-hovercard--dwelling", "astro-hovercard--ready");
     delete hoverCard.dataset.accent;
+    activeDwellPayload = null;
+    if (dwellBar) {
+      dwellBar.style.animation = "none";
+    }
+    if (dwellCta) {
+      dwellCta.textContent = "";
+      dwellCta.hidden = true;
+    }
   }
 
-  function renderSelection(payload) {
-    selectedPayload = payload || null;
-    const selectionRoot = selectionEyebrow?.closest(".astro-selection");
-    if (!selectionEyebrow || !selectionTitle || !selectionDetail || !selectionMeta || !(selectionLink instanceof HTMLAnchorElement)) {
+  function positionHoverCard(labelRect) {
+    if (!hoverCard || !viewerStage) {
       return;
     }
+    const stageRect = viewerStage.getBoundingClientRect();
+    const cardWidth = hoverCard.offsetWidth || 280;
+    const cardHeight = hoverCard.offsetHeight || 160;
+    const edge = 14;
 
-    if (!payload) {
-      if (selectionRoot) {
-        delete selectionRoot.dataset.accent;
-      }
-      selectionEyebrow.textContent = "No selection";
-      selectionTitle.textContent = "Hover or click a label";
-      selectionDetail.textContent =
-        "Hover shows transient tooltip. Click any star, deep-sky object, or constellation to pin its info here.";
-      selectionMeta.innerHTML = "";
-      selectionLink.hidden = true;
-      selectionLink.removeAttribute("href");
-      return;
+    let x = labelRect.right - stageRect.left + 10;
+    let y = labelRect.top - stageRect.top - cardHeight * 0.5 + labelRect.height * 0.5;
+
+    if (x + cardWidth + edge > stageRect.width) {
+      x = labelRect.left - stageRect.left - cardWidth - 10;
+    }
+    if (y + cardHeight + edge > stageRect.height) {
+      y = stageRect.height - cardHeight - edge;
+    }
+    if (y < edge) {
+      y = edge;
     }
 
-    if (selectionRoot) {
-      selectionRoot.dataset.accent = normalizeSelectionAccent(payload.accent);
-    }
-    selectionEyebrow.textContent = payload.eyebrow || "Selected object";
-    selectionTitle.textContent = payload.title || "Unknown object";
-    selectionDetail.textContent = payload.detail || "";
-    selectionMeta.innerHTML = (payload.meta || []).map((item) => `<span>${item}</span>`).join("");
-    if (payload.docUrl) {
-      selectionLink.href = payload.docUrl;
-      selectionLink.hidden = false;
-      selectionLink.textContent = `Open ${payload.meta?.[payload.meta.length - 1] || "documentation"}`;
-    } else {
-      selectionLink.hidden = true;
-      selectionLink.removeAttribute("href");
-    }
+    hoverCard.style.setProperty("--astro-hover-x", `${clamp(x, edge, Math.max(edge, stageRect.width - cardWidth - edge)).toFixed(2)}px`);
+    hoverCard.style.setProperty("--astro-hover-y", `${y.toFixed(2)}px`);
   }
 
   function renderHoverCard(payload) {
@@ -349,8 +226,11 @@ export function initAstroImmersive() {
       return;
     }
 
+    activeDwellPayload = payload;
     hoverCard.hidden = false;
     hoverCard.dataset.accent = payload.accent || "cyan";
+    hoverCard.classList.remove("astro-hovercard--ready");
+    hoverCard.classList.add("astro-hovercard--dwelling");
 
     if (hoverEyebrow) {
       hoverEyebrow.textContent = payload.eyebrow || "";
@@ -364,28 +244,38 @@ export function initAstroImmersive() {
     if (hoverMeta) {
       hoverMeta.innerHTML = (payload.meta || []).map((item) => `<span>${item}</span>`).join("");
     }
-    if (hoverLink instanceof HTMLAnchorElement) {
-      hoverLink.href = payload.docUrl || "#";
-      hoverLink.hidden = !payload.docUrl;
-      hoverLink.textContent = payload.docUrl ? `Open ${payload.meta?.[payload.meta.length - 1] || "documentation"}` : "";
+    if (dwellCta) {
+      dwellCta.textContent = "";
+      dwellCta.hidden = true;
+    }
+    if (dwellBar) {
+      dwellBar.style.animation = "none";
+      // Force reflow to restart animation
+      void dwellBar.offsetWidth;
+      dwellBar.style.animation = "";
     }
 
-    const stageRect = viewerStage.getBoundingClientRect();
-    const cardWidth = hoverCard.offsetWidth || 280;
-    const cardHeight = hoverCard.offsetHeight || 160;
-    const edge = 14;
-    let x = payload.pointerX - stageRect.left + 18;
-    let y = payload.pointerY - stageRect.top + 18;
-
-    if (x + cardWidth + edge > stageRect.width) {
-      x = payload.pointerX - stageRect.left - cardWidth - 18;
+    if (payload.labelRect) {
+      positionHoverCard(payload.labelRect);
     }
-    if (y + cardHeight + edge > stageRect.height) {
-      y = payload.pointerY - stageRect.top - cardHeight - 18;
+  }
+
+  function onDwellComplete(payload) {
+    if (!hoverCard || !activeDwellPayload) {
+      return;
+    }
+    hoverCard.classList.remove("astro-hovercard--dwelling");
+    hoverCard.classList.add("astro-hovercard--ready");
+
+    if (dwellCta && payload.docUrl) {
+      const source = payload.docSource || "documentation";
+      dwellCta.textContent = `Open ${source} →`;
+      dwellCta.hidden = false;
     }
 
-    hoverCard.style.setProperty("--astro-hover-x", `${clamp(x, edge, Math.max(edge, stageRect.width - cardWidth - edge)).toFixed(2)}px`);
-    hoverCard.style.setProperty("--astro-hover-y", `${clamp(y, edge, Math.max(edge, stageRect.height - cardHeight - edge)).toFixed(2)}px`);
+    if (payload.labelRect) {
+      positionHoverCard(payload.labelRect);
+    }
   }
 
   const overlayController = createAstroOverlayController({
@@ -393,8 +283,8 @@ export function initAstroImmersive() {
     imageNode: viewerImage,
     layerNode: viewerOverlay,
     onHover: renderHoverCard,
+    onDwellComplete,
     onLeave: hideHoverCard,
-    onActivate: renderSelection,
   });
 
   function clampTransform() {
@@ -413,7 +303,7 @@ export function initAstroImmersive() {
       return;
     }
 
-    zoomReadout.textContent = `${transform.scale.toFixed(2)}x`;
+    zoomReadout.textContent = `${transform.scale.toFixed(2)}×`;
     const contentWidth = viewerOverlay.clientWidth || viewerImage.clientWidth || viewerViewport.clientWidth || 1;
     const contentHeight = viewerOverlay.clientHeight || viewerImage.clientHeight || viewerViewport.clientHeight || 1;
     const visibleWidthPct = clamp(((viewerViewport.clientWidth || 1) / Math.max(contentWidth * transform.scale, 1)) * 100, 0, 100);
@@ -445,9 +335,6 @@ export function initAstroImmersive() {
 
   function resetTransform() {
     transform = { scale: ASTRO_MIN_ZOOM, x: 0, y: 0 };
-    if (zoomRange instanceof HTMLInputElement) {
-      zoomRange.value = "100";
-    }
     requestTransform();
   }
 
@@ -465,9 +352,6 @@ export function initAstroImmersive() {
     transform.y = localY - (localY - transform.y) * scaleRatio;
     transform.scale = scale;
 
-    if (zoomRange instanceof HTMLInputElement) {
-      zoomRange.value = String(Math.round(scale * 100));
-    }
     requestTransform();
   }
 
@@ -544,29 +428,12 @@ export function initAstroImmersive() {
       ].filter(Boolean);
       viewerMeta.textContent = parts.join(" / ");
     }
-    if (viewerSummary) {
-      viewerSummary.textContent = item.summary;
-    }
-    if (viewerAngle) {
-      viewerAngle.textContent = formatAngle(item.metadata);
-    }
-    if (viewerCenter) {
-      viewerCenter.textContent = formatCenter(item.metadata);
-    }
-    if (viewerCaptured) {
-      viewerCaptured.textContent = formatCapturedAt(item.metadata?.capturedAt);
-    }
 
-    renderSelection(null);
     hideHoverCard();
     overlayController.setImage({ annotationKey: item.id });
     overlayController.setFilters(filters);
-    overlayController.setOpacity((Number(opacityInput?.value) || 100) / 100);
     renderHistogram(histogramCanvas, item.metadata?.histogram);
     resetTransform();
-
-    const defaultSelection = item.deepSkyObjects?.[0] ? buildSelectionPayload(item.deepSkyObjects[0]) : null;
-    renderSelection(defaultSelection);
   }
 
   function openViewer(index) {
@@ -629,10 +496,6 @@ export function initAstroImmersive() {
     });
   });
 
-  opacityInput?.addEventListener("input", () => {
-    overlayController.setOpacity((Number(opacityInput.value) || 100) / 100);
-  });
-
   zoomButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const action = button.dataset.astroZoom;
@@ -644,10 +507,6 @@ export function initAstroImmersive() {
         resetTransform();
       }
     });
-  });
-
-  zoomRange?.addEventListener("input", () => {
-    setScale((Number(zoomRange.value) || 100) / 100);
   });
 
   viewerViewport.addEventListener(
@@ -667,7 +526,7 @@ export function initAstroImmersive() {
     if (event.button !== 0 || transform.scale <= ASTRO_MIN_ZOOM) {
       return;
     }
-    if (event.target instanceof Element && event.target.closest(".astro-overlay__label, .astro-overlay__hotspot, .astro-selection__link")) {
+    if (event.target instanceof Element && event.target.closest(".astro-overlay__label, .astro-overlay__hotspot")) {
       return;
     }
     event.preventDefault();

@@ -739,28 +739,32 @@
           </div>
 
           <div class="astro-viewer__stage-ui">
-            <div class="astro-viewer__zoom-cluster">
-              <button class="astro-chip astro-chip--icon" type="button" data-astro-zoom="out" aria-label="Zoom out">-</button>
-              <label class="astro-chip astro-chip--slider">
-                <span>Zoom</span>
-                <input type="range" min="100" max="400" step="5" value="100" data-astro-zoom-range>
-              </label>
-              <button class="astro-chip astro-chip--icon" type="button" data-astro-zoom="in" aria-label="Zoom in">+</button>
-              <button class="astro-chip astro-chip--reset" type="button" data-astro-zoom="reset">Reset View</button>
+            <div class="astro-viewer__zoom-bar">
+              <button class="astro-zoom-btn" type="button" data-astro-zoom="out" aria-label="Zoom out">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6.5" width="10" height="1" rx="0.5" fill="currentColor"/></svg>
+              </button>
+              <span class="astro-zoom-readout" data-astro-zoom-readout>1.00×</span>
+              <button class="astro-zoom-btn" type="button" data-astro-zoom="in" aria-label="Zoom in">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6.5" width="10" height="1" rx="0.5" fill="currentColor"/><rect x="6.5" y="2" width="1" height="10" rx="0.5" fill="currentColor"/></svg>
+              </button>
+              <span class="astro-zoom-divider" aria-hidden="true"></span>
+              <button class="astro-zoom-reset" type="button" data-astro-zoom="reset" aria-label="Reset zoom">Fit</button>
             </div>
 
-            <div class="astro-viewer__histogram astro-card" data-astro-histogram-panel>
-              <div class="astro-card__head">
-                <p class="astro-card__eyebrow">Color histogram</p>
-                <span class="astro-card__meta">RGB</span>
-              </div>
-              <canvas class="astro-viewer__histogram-canvas" width="320" height="120" data-astro-histogram></canvas>
+            <div class="astro-viewer__overlay-toggles">
+              <button class="astro-layer-toggle is-active" type="button" data-astro-toggle="stars" aria-pressed="true">Stars</button>
+              <button class="astro-layer-toggle is-active" type="button" data-astro-toggle="nebulae" aria-pressed="true">Nebulae</button>
+              <button class="astro-layer-toggle is-active" type="button" data-astro-toggle="constellations" aria-pressed="true">Constellations</button>
             </div>
 
-            <div class="astro-viewer__minimap astro-card" data-astro-minimap>
-              <div class="astro-card__head">
-                <p class="astro-card__eyebrow">Global view</p>
-                <span class="astro-card__meta" data-astro-zoom-readout>1.00x</span>
+            <div class="astro-viewer__histogram" data-astro-histogram-panel>
+              <p class="astro-viewer__histogram-label">RGB</p>
+              <canvas class="astro-viewer__histogram-canvas" width="280" height="80" data-astro-histogram></canvas>
+            </div>
+
+            <div class="astro-viewer__minimap" data-astro-minimap>
+              <div class="astro-viewer__minimap-head">
+                <span class="astro-viewer__minimap-label">Global view</span>
               </div>
               <div class="astro-viewer__minimap-frame">
                 <img class="astro-viewer__minimap-image" data-astro-minimap-image alt="">
@@ -774,70 +778,14 @@
             <strong class="astro-hovercard__title" data-astro-hover-title></strong>
             <p class="astro-hovercard__detail" data-astro-hover-detail></p>
             <div class="astro-hovercard__meta" data-astro-hover-meta></div>
-            <a class="astro-hovercard__link" data-astro-hover-link target="_blank" rel="noopener noreferrer">Open documentation</a>
+            <div class="astro-hovercard__dwell" aria-hidden="true">
+              <div class="astro-hovercard__dwell-track">
+                <div class="astro-hovercard__dwell-bar" data-astro-dwell-bar></div>
+              </div>
+              <span class="astro-hovercard__dwell-cta" data-astro-dwell-cta></span>
+            </div>
           </div>
         </div>
-
-        <aside class="astro-viewer__hud">
-          <div class="astro-viewer__panel astro-viewer__panel--summary">
-            <p class="astro-viewer__panel-tag">FITS readout</p>
-            <p class="astro-viewer__summary" data-astro-viewer-summary></p>
-            <div class="astro-viewer__facts">
-              <div>
-                <span>Frame angle</span>
-                <strong data-astro-viewer-angle>--</strong>
-              </div>
-              <div>
-                <span>Center</span>
-                <strong data-astro-viewer-center>--</strong>
-              </div>
-              <div>
-                <span>Captured</span>
-                <strong data-astro-viewer-captured>--</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="astro-viewer__panel astro-viewer__panel--selection">
-            <p class="astro-viewer__panel-tag">Selected object</p>
-            <div class="astro-selection" data-astro-selection>
-              <p class="astro-selection__eyebrow" data-astro-selection-eyebrow>No selection</p>
-              <strong class="astro-selection__title" data-astro-selection-title>Hover or click a label</strong>
-              <p class="astro-selection__detail" data-astro-selection-detail>
-                Hover shows transient tooltip. Click any star, deep-sky object, or constellation to pin its info here.
-              </p>
-              <div class="astro-selection__meta" data-astro-selection-meta></div>
-              <a
-                class="astro-selection__link"
-                data-astro-selection-link
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                hidden
-              >
-                Open official documentation
-              </a>
-            </div>
-          </div>
-
-          <div class="astro-viewer__panel astro-viewer__panel--controls">
-            <p class="astro-viewer__panel-tag">Overlay layers</p>
-            <div class="astro-viewer__toggle-grid">
-              <button class="astro-toggle is-active" type="button" data-astro-toggle="stars" aria-pressed="true">Stars</button>
-              <button class="astro-toggle is-active" type="button" data-astro-toggle="nebulae" aria-pressed="true">Nebulae</button>
-              <button class="astro-toggle is-active" type="button" data-astro-toggle="constellations" aria-pressed="true">Constellations</button>
-            </div>
-
-            <label class="astro-viewer__opacity">
-              <span>Overlay intensity</span>
-              <input type="range" min="20" max="100" step="1" value="100" data-astro-opacity>
-            </label>
-
-            <div class="astro-viewer__interaction-copy">
-              <span>Wheel to zoom · drag to pan · hover labels for parameters · click any object for official documentation.</span>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   </div>

@@ -1,6 +1,7 @@
 import { getAstroAnnotation } from "./stars/astro-annotations.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+const DWELL_MS = 1400;
 
 function createSvgNode(tagName, attributes = {}) {
   const node = document.createElementNS(SVG_NS, tagName);
@@ -87,9 +88,9 @@ function buildTooltipPayload(type, item) {
       meta: [
         `RA ${item.raDeg ?? "--"}°`,
         `Dec ${item.decDeg ?? "--"}°`,
-        item.docSource || "CDS SIMBAD",
       ],
       docUrl: item.docUrl,
+      docSource: item.docSource || "CDS SIMBAD",
       accent: "gold",
     };
   }
@@ -102,9 +103,9 @@ function buildTooltipPayload(type, item) {
       meta: [
         `${item.points?.length ?? 0} visible guide stars`,
         `${item.lines?.length ?? 0} visible segments`,
-        item.docSource || "IAU",
       ],
       docUrl: item.docUrl,
+      docSource: item.docSource || "IAU Constellations",
       accent: "cyan",
     };
   }
@@ -117,9 +118,9 @@ function buildTooltipPayload(type, item) {
       item.mag != null ? `Mag ${Number(item.mag).toFixed(1)}` : "Mag --",
       item.sizeArcmin ? `Size ${Number(item.sizeArcmin).toFixed(1)}′` : "Size --",
       `RA ${item.raDeg ?? "--"}° / Dec ${item.decDeg ?? "--"}°`,
-      item.docSource || "CDS SIMBAD",
     ],
     docUrl: item.docUrl,
+    docSource: item.docSource || "CDS SIMBAD",
     accent: item.category === "galaxy" ? "amber" : "rust",
   };
 }
@@ -129,22 +130,45 @@ function bindInteractive(node, payload, callbacks) {
     return;
   }
 
-  const emitMove = (event) => {
-    callbacks.onHover?.({
-      ...payload,
-      pointerX: event.clientX,
-      pointerY: event.clientY,
-    });
+  let dwellTimer = null;
+  let dwellReady = false;
+
+  const cancelDwell = () => {
+    if (dwellTimer) {
+      clearTimeout(dwellTimer);
+      dwellTimer = null;
+    }
+    dwellReady = false;
   };
 
-  node.addEventListener("pointerenter", emitMove);
-  node.addEventListener("pointermove", emitMove);
-  node.addEventListener("pointerleave", () => callbacks.onLeave?.());
-  node.addEventListener("focus", (event) => emitMove(event));
-  node.addEventListener("blur", () => callbacks.onLeave?.());
+  const startDwell = () => {
+    cancelDwell();
+    const rect = node.getBoundingClientRect();
+    callbacks.onHover?.({
+      ...payload,
+      labelRect: rect,
+      dwellStarted: true,
+    });
+
+    dwellTimer = setTimeout(() => {
+      dwellReady = true;
+      dwellTimer = null;
+      callbacks.onDwellComplete?.({ ...payload, labelRect: node.getBoundingClientRect() });
+    }, DWELL_MS);
+  };
+
+  node.addEventListener("pointerenter", startDwell);
+
+  node.addEventListener("pointerleave", () => {
+    cancelDwell();
+    callbacks.onLeave?.();
+  });
+
   node.addEventListener("click", (event) => {
     event.stopPropagation();
-    callbacks.onActivate?.(payload);
+    if (dwellReady && payload.docUrl) {
+      window.open(payload.docUrl, "_blank", "noopener,noreferrer");
+    }
   });
 }
 
@@ -398,8 +422,8 @@ export function createAstroOverlayController({
   imageNode,
   layerNode,
   onHover,
+  onDwellComplete,
   onLeave,
-  onActivate,
 }) {
   if (!photoCard || !imageNode || !layerNode) {
     return {
@@ -448,17 +472,16 @@ export function createAstroOverlayController({
     }
 
     const cardRect = photoCard.getBoundingClientRect();
-    const imageRect = imageNode.getBoundingClientRect();
-    if (!cardRect.width || !cardRect.height || !imageRect.width || !imageRect.height) {
+    if (!cardRect.width || !cardRect.height) {
       return;
     }
 
-    const left = imageRect.left - cardRect.left;
-    const top = imageRect.top - cardRect.top;
-    layerNode.style.left = `${left.toFixed(2)}px`;
-    layerNode.style.top = `${top.toFixed(2)}px`;
-    layerNode.style.width = `${imageRect.width.toFixed(2)}px`;
-    layerNode.style.height = `${imageRect.height.toFixed(2)}px`;
+    // Position overlay using image element's layout dimensions (unaffected by CSS transforms)
+    // to avoid double-applying the zoom transform.
+    layerNode.style.left = "0px";
+    layerNode.style.top = "0px";
+    layerNode.style.width = `${imageNode.clientWidth.toFixed(2)}px`;
+    layerNode.style.height = `${imageNode.clientHeight.toFixed(2)}px`;
     applySceneTransform();
     layoutOverlayLabels(layerNode, labelEntries, transformAnchor);
   }
@@ -517,7 +540,7 @@ export function createAstroOverlayController({
     }
 
     activeAnnotation = annotation;
-    labelEntries = renderOverlay(layerNode, annotation, { onHover, onLeave, onActivate });
+    labelEntries = renderOverlay(layerNode, annotation, { onHover, onDwellComplete, onLeave });
     sceneNode = layerNode.querySelector(".astro-overlay__scene");
     applyFilterState(layerNode, activeFilters);
     applyOverlayOpacity(layerNode, activeOpacity);
