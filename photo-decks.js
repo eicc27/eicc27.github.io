@@ -153,7 +153,15 @@ export function initPhotoDecks({ reducedMotionQuery } = {}) {
   const deckCountNode = gallery.querySelector("[data-photo-gallery-count]");
   const deckTitleNode = gallery.querySelector("[data-photo-gallery-deck-title]");
   const frameTitleNode = gallery.querySelector("[data-photo-gallery-frame-title]");
-  const tagsNode = gallery.querySelector("[data-photo-gallery-tags]");
+  const exifNode = gallery.querySelector("[data-photo-gallery-exif]");
+  const exifCamera = gallery.querySelector("[data-photo-gallery-camera]");
+  const exifLens = gallery.querySelector("[data-photo-gallery-lens]");
+  const exifCapturedAt = gallery.querySelector("[data-photo-gallery-captured-at]");
+  const exifAperture = gallery.querySelector("[data-photo-gallery-aperture]");
+  const exifShutter = gallery.querySelector("[data-photo-gallery-shutter]");
+  const exifIso = gallery.querySelector("[data-photo-gallery-iso]");
+  const exifFocalLength = gallery.querySelector("[data-photo-gallery-focal-length]");
+  const exifFocalLength35 = gallery.querySelector("[data-photo-gallery-focal-length-35]");
   const imageNode = gallery.querySelector("[data-photo-gallery-image]");
   const prevButton = gallery.querySelector("[data-photo-gallery-prev]");
   const nextButton = gallery.querySelector("[data-photo-gallery-next]");
@@ -392,10 +400,19 @@ export function initPhotoDecks({ reducedMotionQuery } = {}) {
       frameTitleNode.textContent = image.title;
     }
 
-    if (tagsNode) {
-      tagsNode.innerHTML = activeDeck.tags
-        .map((tag) => `<span class="photo-gallery__tag">${tag}</span>`)
-        .join("");
+    const capture = image.capture || null;
+    if (exifNode) {
+      exifNode.style.display = capture ? "" : "none";
+      if (capture) {
+        if (exifCamera) exifCamera.textContent = capture.camera || "--";
+        if (exifLens) exifLens.textContent = capture.lens || "--";
+        if (exifCapturedAt) exifCapturedAt.textContent = capture.capturedAt || "--";
+        if (exifAperture) exifAperture.textContent = capture.aperture || "--";
+        if (exifShutter) exifShutter.textContent = capture.shutter || "--";
+        if (exifIso) exifIso.textContent = capture.iso || "--";
+        if (exifFocalLength) exifFocalLength.textContent = capture.focalLength || "--";
+        if (exifFocalLength35) exifFocalLength35.textContent = capture.focalLength35 || "--";
+      }
     }
 
     astroOverlay.setImage(image);

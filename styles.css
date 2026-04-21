@@ -3603,7 +3603,7 @@ html[data-theme="dark"] .studio-map-stat strong {
   position: absolute;
   left: 50%;
   right: auto;
-  bottom: 136px;
+  bottom: 12px;
   z-index: 4;
   display: grid;
   gap: 8px;
@@ -6321,7 +6321,7 @@ html[data-theme="dark"] .studio-map-stat strong {
   }
 
   .bird-gallery-meta-strip {
-    bottom: 124px;
+    bottom: 10px;
     width: min(90vw, 880px);
   }
 
@@ -6429,7 +6429,7 @@ html[data-theme="dark"] .studio-map-stat strong {
   }
 
   .bird-gallery-meta-strip {
-    bottom: 116px;
+    bottom: 10px;
     width: min(92vw, 760px);
   }
 
@@ -6635,7 +6635,7 @@ html[data-theme="dark"] .studio-map-stat strong {
   }
 
   .bird-gallery-meta-strip {
-    bottom: 104px;
+    bottom: 8px;
     gap: 7px;
     width: min(94vw, 560px);
   }
