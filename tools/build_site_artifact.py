@@ -22,7 +22,7 @@ DIRECTORIES_TO_COPY = (
 FILES_TO_COPY = (
     "stars/astro-annotations.js",
     "stars/astro-annotations.json",
-    "videos/web/chongqing-sunset-1080p.jpg",
+    "videos/web/chongqing-sunset-1080p.webp",
     "videos/web/chongqing-sunset-1080p.mp4",
     "videos/web/chongqing-sunset-15s-play.mp4",
     "videos/web/chongqing-sunset-15s-rewind.mp4",
