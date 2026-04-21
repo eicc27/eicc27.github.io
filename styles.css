@@ -1,16 +1,10 @@
-@font-face {
-  font-family: "Silkscreen";
-  src: url("./assets/fonts/silkscreen-latin-400-normal.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
+
 
 @font-face {
-  font-family: "Silkscreen";
-  src: url("./assets/fonts/silkscreen-latin-700-normal.woff2") format("woff2");
+  font-family: "Minecraft";
+  src: url("./assets/fonts/minecraft-regular.woff2") format("woff2");
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400;
   font-display: swap;
 }
 
@@ -1570,11 +1564,10 @@ a {
 .studio-hovercard__eyebrow {
   margin: 0;
   color: rgba(212, 184, 255, 0.94);
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
-  font-size: 0.63rem;
-  font-weight: 700;
-  line-height: 1.55;
-  letter-spacing: 0.06em;
+  font-family: "Minecraft", monospace;
+  font-size: 0.48rem;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.9);
 }
@@ -1582,10 +1575,10 @@ a {
 .studio-hovercard__title {
   margin: 0;
   color: rgba(247, 248, 250, 0.98);
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.92rem, 1.28vw, 1rem);
-  line-height: 1.52;
+  font-family: "Minecraft", monospace;
+  font-weight: 400;
+  font-size: clamp(0.66rem, 0.9vw, 0.72rem);
+  line-height: 1.72;
   letter-spacing: 0;
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.88);
 }
@@ -1593,9 +1586,9 @@ a {
 .studio-hovercard__detail {
   margin: 0;
   color: rgba(220, 214, 236, 0.88);
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
-  font-size: 0.74rem;
-  line-height: 1.7;
+  font-family: "Minecraft", monospace;
+  font-size: 0.52rem;
+  line-height: 1.9;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.82);
 }
 
@@ -1609,9 +1602,9 @@ a {
   display: block;
   min-width: 0;
   color: rgba(186, 180, 206, 0.88);
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
-  font-size: 0.64rem;
-  line-height: 1.62;
+  font-family: "Minecraft", monospace;
+  font-size: 0.48rem;
+  line-height: 1.8;
   letter-spacing: 0;
   text-transform: none;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.78);
@@ -5500,30 +5493,31 @@ html[data-theme="dark"] .studio-map-stat strong {
 .astro-hovercard__title,
 .astro-hovercard__detail,
 .astro-hovercard__meta span {
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
+  font-family: "Minecraft", monospace;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.86);
 }
 
 .astro-hovercard__eyebrow {
   margin: 0;
   color: rgba(176, 231, 255, 0.86);
-  font-size: 0.6rem;
-  line-height: 1.55;
-  letter-spacing: 0.06em;
+  font-size: 0.46rem;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .astro-hovercard__title {
   color: rgba(247, 248, 250, 0.98);
-  font-size: clamp(0.86rem, 1.1vw, 0.96rem);
-  line-height: 1.44;
+  font-weight: 400;
+  font-size: clamp(0.62rem, 0.82vw, 0.7rem);
+  line-height: 1.72;
 }
 
 .astro-hovercard__detail {
   margin: 0;
   color: rgba(210, 218, 232, 0.82);
-  font-size: 0.72rem;
-  line-height: 1.66;
+  font-size: 0.5rem;
+  line-height: 1.9;
 }
 
 .astro-hovercard__meta {
@@ -5534,8 +5528,8 @@ html[data-theme="dark"] .studio-map-stat strong {
 .astro-hovercard__meta span {
   display: block;
   color: rgba(178, 190, 212, 0.82);
-  font-size: 0.62rem;
-  line-height: 1.6;
+  font-size: 0.46rem;
+  line-height: 1.8;
 }
 
 .astro-hovercard__meta span::before {
@@ -5574,9 +5568,9 @@ html[data-theme="dark"] .studio-map-stat strong {
 
 .astro-hovercard__dwell-cta {
   color: var(--astro-dwell-color, rgba(102, 214, 255, 0.9));
-  font-family: "Silkscreen", "Space Grotesk", sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
+  font-family: "Minecraft", monospace;
+  font-size: 0.44rem;
+  letter-spacing: 0.04em;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.86);
 }
 

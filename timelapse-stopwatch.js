@@ -278,7 +278,11 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return clamp(playbackOriginTime + elapsedSeconds, 0, CLIP_DURATION);
     }
 
-    return getVideoAnchorTime();
+    // When the clock is stopped (paused/ready/ended), return the saved anchor position.
+    // Re-reading video.currentTime here would return the decoder's prefetch position
+    // (up to a few frames ahead of the last rendered frame), causing time jumps that
+    // accumulate across repeated pause/resume cycles.
+    return playbackOriginTime;
   }
 
   function getStageStickyBounds() {
@@ -1434,7 +1438,7 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
       return;
     }
 
-    if (!videoLoaded || state === "loading" || state === "rewinding") {
+    if (!videoLoaded || state === "loading" || state === "rewinding" || state === "playing") {
       return;
     }
 
@@ -1487,7 +1491,11 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
     pauseVideoElement();
     stopDisplayLoop();
     stopRewindLoop();
-    const pausedTime = getVideoAnchorTime();
+    // Use the last painted frame time rather than video.currentTime: the decoder
+    // position can be 1–3 frames ahead of the last displayed frame, and reading
+    // it here causes a visible time jump on every pause that accumulates across
+    // repeated pause/resume cycles.
+    const pausedTime = currentTime;
     stopPlaybackClock(pausedTime);
     paintProgress(pausedTime, { forceText: true });
     setState("paused");
