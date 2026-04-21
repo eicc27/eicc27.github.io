@@ -19,7 +19,7 @@ from annotate_fits_sky import ROOT, build_constellation_groups, get_visible_star
 
 OUTPUT_JSON_PATH = ROOT / "stars" / "astro-annotations.json"
 OUTPUT_MODULE_PATH = ROOT / "stars" / "astro-annotations.js"
-WEB_OUTPUT_DIR = ROOT / "stars" / "web"
+WEB_OUTPUT_DIR = ROOT / "assets" / "astro"
 WEB_MAX_EDGE = 2400
 CATALOG_DIR = ROOT / "stars" / "catalogs"
 IAU_CATALOG_PATH = CATALOG_DIR / "iau_named_stars.json"
