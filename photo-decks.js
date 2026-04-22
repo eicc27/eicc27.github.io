@@ -589,18 +589,10 @@ export function initPhotoDecks({ reducedMotionQuery } = {}) {
 
     const loader = new Image();
     loader.src = nextImage.src;
-
-    try {
-      await loader.decode();
-    } catch {
-      // Ignore decode failures and still swap the image source.
-    }
-
-    if (nextToken !== loadToken) {
-      return;
-    }
-
+    // Decode and animate out in parallel so the click feels instant.
+    const decodePromise = loader.decode().catch(() => {});
     await animatePhotoOut(motionDirection);
+    await decodePromise;
 
     if (nextToken !== loadToken) {
       return;

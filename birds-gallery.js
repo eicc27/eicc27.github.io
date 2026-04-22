@@ -465,18 +465,9 @@ export function initBirdsGallery({ reducedMotionQuery } = {}) {
 
     const loader = new Image();
     loader.src = bird.displaySrc;
-
-    try {
-      await loader.decode();
-    } catch {
-      // Ignore decode failures and still swap the image source.
-    }
-
-    if (nextToken !== loadToken) {
-      return;
-    }
-
+    const decodePromise = loader.decode().catch(() => {});
     await animatePhotoOut(motionDirection);
+    await decodePromise;
 
     if (nextToken !== loadToken) {
       return;

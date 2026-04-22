@@ -167,6 +167,14 @@ export function initTimelapseStopwatch({ reducedMotionQuery } = {}) {
   root.setAttribute("data-timelapse-quality", "1080p");
   segment.dataset.showcase = "active";
 
+  // Start buffering the forward video immediately so it is ready when the
+  // user reaches the stopwatch, regardless of scroll progress.
+  const forwardSrc = video.dataset.src;
+  if (forwardSrc && !video.src) {
+    video.src = forwardSrc;
+    video.preload = "auto";
+  }
+
   function prefersReducedMotion() {
     return Boolean(reducedMotionQuery?.matches);
   }
