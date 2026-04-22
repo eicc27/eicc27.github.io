@@ -1,4 +1,3 @@
-const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 const GRID_SIZE = 1.24;
 const STUDIO_LABEL_FONT = `'Oxanium', 'Space Grotesk', sans-serif`;
 const STUDIO_DETAIL_FONT = `'Space Grotesk', 'Noto Sans SC', sans-serif`;
@@ -160,7 +159,7 @@ export async function createStudioScene({
     throw new Error("Studio scene requires a valid canvas element.");
   }
 
-  const THREE = await import(THREE_URL);
+  const THREE = await import("three");
   await ensureStudioFonts();
 
   const renderer = new THREE.WebGLRenderer({
@@ -251,13 +250,13 @@ export async function createStudioScene({
 
     if (!prefersReducedMotion) {
       if (viewportArea > 1500000) {
-        maxDpr = 1;
+        maxDpr = 1.2;
       } else if (viewportArea > 1200000) {
-        maxDpr = 1.04;
+        maxDpr = 1.4;
       } else if (viewportArea > 900000) {
-        maxDpr = 1.1;
+        maxDpr = 1.6;
       } else {
-        maxDpr = 1.18;
+        maxDpr = 2;
       }
     }
 
@@ -637,8 +636,8 @@ function createMarker(THREE, marker) {
 
 function createMarkerSprite(THREE, type) {
   const canvas = document.createElement("canvas");
-  canvas.width = 384;
-  canvas.height = 384;
+  canvas.width = 768;
+  canvas.height = 768;
   const context = canvas.getContext("2d");
 
   if (!context) {
@@ -648,32 +647,32 @@ function createMarkerSprite(THREE, type) {
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.strokeStyle = "rgba(246, 248, 251, 0.96)";
   context.fillStyle = "rgba(246, 248, 251, 0.96)";
-  context.lineWidth = 10;
+  context.lineWidth = 20;
   context.lineJoin = "round";
   context.lineCap = "round";
   context.shadowColor = "rgba(168, 205, 255, 0.12)";
-  context.shadowBlur = 12;
+  context.shadowBlur = 24;
 
-  drawRoundedRectPath(context, 104, 78, 176, 222, 30);
+  drawRoundedRectPath(context, 208, 156, 352, 444, 60);
   context.stroke();
 
   if (type === "speaker") {
-    drawCirclePath(context, 192, 192, 38);
+    drawCirclePath(context, 384, 384, 76);
     context.stroke();
-    drawCirclePath(context, 192, 192, 72);
+    drawCirclePath(context, 384, 384, 144);
     context.stroke();
   } else if (type === "sub") {
-    drawCirclePath(context, 192, 198, 60);
+    drawCirclePath(context, 384, 396, 120);
     context.stroke();
     context.beginPath();
-    context.arc(192, 198, 12, 0, Math.PI * 2);
+    context.arc(384, 396, 24, 0, Math.PI * 2);
     context.fill();
   } else {
     context.beginPath();
-    context.arc(192, 194, 56, Math.PI * 0.12, Math.PI * 0.88);
+    context.arc(384, 388, 112, Math.PI * 0.12, Math.PI * 0.88);
     context.stroke();
     context.beginPath();
-    context.arc(192, 228, 14, 0, Math.PI * 2);
+    context.arc(384, 456, 28, 0, Math.PI * 2);
     context.fill();
   }
 
@@ -699,8 +698,8 @@ function createMarkerSprite(THREE, type) {
 
 function createMarkerLabelSprite(THREE, title, detail, type) {
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 440;
+  canvas.width = 2048;
+  canvas.height = 880;
   const context = canvas.getContext("2d");
 
   if (!context) {
@@ -708,8 +707,8 @@ function createMarkerLabelSprite(THREE, title, detail, type) {
   }
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-  const titleSize = type === "tile" ? 78 : 48;
-  const detailSize = 28;
+  const titleSize = type === "tile" ? 156 : 96;
+  const detailSize = 56;
   const titleFont =
     type === "tile"
       ? STUDIO_LABEL_FONT
@@ -718,19 +717,19 @@ function createMarkerLabelSprite(THREE, title, detail, type) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.lineJoin = "round";
-  context.lineWidth = 12;
+  context.lineWidth = 24;
   context.strokeStyle = "rgba(7, 10, 14, 0.9)";
-  context.strokeText(title, canvas.width / 2, detail ? 164 : 220);
+  context.strokeText(title, canvas.width / 2, detail ? 328 : 440);
   context.fillStyle = "rgba(247, 247, 247, 0.96)";
-  context.fillText(title, canvas.width / 2, detail ? 164 : 220);
+  context.fillText(title, canvas.width / 2, detail ? 328 : 440);
 
   if (detail) {
     context.font = `600 ${detailSize}px ${STUDIO_DETAIL_FONT}`;
-    context.lineWidth = 10;
+    context.lineWidth = 20;
     context.strokeStyle = "rgba(7, 10, 14, 0.8)";
-    context.strokeText(detail, canvas.width / 2, 246);
+    context.strokeText(detail, canvas.width / 2, 492);
     context.fillStyle = "rgba(225, 230, 238, 0.8)";
-    context.fillText(detail, canvas.width / 2, 246);
+    context.fillText(detail, canvas.width / 2, 492);
   }
 
   const texture = new THREE.CanvasTexture(canvas);

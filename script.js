@@ -126,6 +126,37 @@ if ("IntersectionObserver" in window) {
   revealNodes.forEach((node) => node.classList.add("is-visible"));
 }
 
+// Pause continuous CSS animations when their sections scroll off-screen to
+// reduce compositor thread load. The animations resume immediately on re-entry.
+if ("IntersectionObserver" in window) {
+  const heroSection = document.querySelector(".hero");
+  const heroMarquee = document.querySelector(".hero-marquee");
+  if (heroSection && heroMarquee) {
+    new IntersectionObserver(
+      ([entry]) => {
+        heroMarquee.style.setProperty(
+          "--marquee-play",
+          entry.isIntersecting ? "running" : "paused"
+        );
+      },
+      { threshold: 0 }
+    ).observe(heroSection);
+  }
+
+  const studioSection = document.querySelector("#studio");
+  if (studioSection) {
+    new IntersectionObserver(
+      ([entry]) => {
+        studioSection.style.setProperty(
+          "--studio-anim-play",
+          entry.isIntersecting ? "running" : "paused"
+        );
+      },
+      { threshold: 0 }
+    ).observe(studioSection);
+  }
+}
+
 async function ensureImmersivePreviewScene() {
   if (!immersivePreviewCanvas) {
     return null;

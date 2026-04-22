@@ -1,5 +1,3 @@
-const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
-
 const LABELS = [
   { text: "ORION", color: "rgba(232, 240, 255, 0.22)", x: -9.2, y: 4.1, z: -28, scale: 9.4 },
   { text: "PORTRAITS", color: "rgba(205, 223, 255, 0.18)", x: 10.8, y: -2.2, z: -46, scale: 12.6 },
@@ -15,7 +13,7 @@ export async function createImmersivePreviewScene({
     throw new Error("Immersive preview scene requires a valid canvas element.");
   }
 
-  const THREE = await import(THREE_URL);
+  const THREE = await import("three");
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
