@@ -227,9 +227,10 @@
             <div class="studio-stage-sticky">
               <article class="studio-map" data-studio-map aria-label="Honeycomb studio map">
                 <div class="studio-map-light" data-studio-map-light aria-hidden="true"></div>
-                <div class="studio-space">
+                <div class="studio-space" data-studio-loading>
                   <div class="studio-space-light" data-studio-space-light aria-hidden="true"></div>
                   <canvas class="studio-canvas" id="studio-canvas" aria-hidden="true"></canvas>
+                  <div class="studio-canvas-loader" aria-hidden="true"></div>
                 </div>
 
                 <div class="studio-hovercard" data-studio-hover hidden>
@@ -952,6 +953,49 @@
     </div>
   </div>
 
+  <script>
+  (function () {
+    var panel = null;
+
+    function getPanel() {
+      if (panel) return panel;
+      panel = document.createElement("div");
+      panel.style.cssText = [
+        "position:fixed", "bottom:16px", "right:16px", "z-index:99999",
+        "max-width:480px", "max-height:60vh", "overflow-y:auto",
+        "display:flex", "flex-direction:column", "gap:6px",
+        "font:12px/1.4 monospace", "pointer-events:none",
+      ].join(";");
+      document.body.appendChild(panel);
+      return panel;
+    }
+
+    function report(kind, message, detail) {
+      var row = document.createElement("div");
+      row.style.cssText = [
+        "background:rgba(12,4,4,0.92)", "color:#ff6b6b",
+        "border:1px solid rgba(255,80,80,0.4)", "border-radius:6px",
+        "padding:8px 10px", "pointer-events:auto", "cursor:pointer",
+        "white-space:pre-wrap", "word-break:break-all",
+      ].join(";");
+      row.textContent = "[" + kind + "] " + message + (detail ? "\n" + detail : "");
+      row.addEventListener("click", function () { row.remove(); });
+      getPanel().appendChild(row);
+    }
+
+    window.addEventListener("error", function (e) {
+      var loc = e.filename ? e.filename.replace(location.origin, "") + ":" + e.lineno : "";
+      report("error", e.message || String(e.error), loc);
+    });
+
+    window.addEventListener("unhandledrejection", function (e) {
+      var msg = e.reason instanceof Error ? e.reason.message : String(e.reason);
+      var stack = e.reason instanceof Error && e.reason.stack
+        ? e.reason.stack.split("\n").slice(1, 4).join("\n") : "";
+      report("promise", msg, stack);
+    });
+  })();
+  </script>
   <script type="importmap">
   {
     "imports": {

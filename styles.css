@@ -1707,6 +1707,38 @@ html[data-theme="dark"] .studio-map-stat strong {
   will-change: opacity;
 }
 
+.studio-canvas-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.studio-space[data-studio-loading] .studio-canvas-loader {
+  opacity: calc(var(--studio-blackout, 0) * 1.4);
+}
+
+.studio-canvas-loader::before {
+  content: "";
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid rgba(140, 168, 199, 0.22);
+  border-top-color: rgba(140, 168, 199, 0.72);
+  border-radius: 50%;
+  animation: studio-loader-spin 1.1s linear infinite;
+}
+
+@keyframes studio-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .studio-readout {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);

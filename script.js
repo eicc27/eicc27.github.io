@@ -459,6 +459,7 @@ async function ensureStudioScene() {
     })
       .then((scene) => {
         studioScene = scene;
+        studioCanvas?.parentElement?.removeAttribute("data-studio-loading");
         scene.setProgress(currentStudioState);
         scene.setPointer?.(currentStudioPointer, { active: isStudioPointerActive });
         return scene;
