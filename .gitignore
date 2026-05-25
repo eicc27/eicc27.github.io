@@ -5,6 +5,8 @@ playwright-mcp-test-output/
 tools/__pycache__/
 *.pyc
 
+.worktrees/
+
 full-cut-*.png
 local-full-after.png
 local-home-shot.png
